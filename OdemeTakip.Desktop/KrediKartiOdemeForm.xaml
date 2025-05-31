@@ -1,0 +1,23 @@
+﻿<Window x:Class="OdemeTakip.Desktop.KrediKartiOdemeForm"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Kredi Kartı Ödeme" Height="350" Width="400">
+    <StackPanel Margin="20">
+        <TextBlock Text="Kart Seçin"/>
+        <ComboBox x:Name="cmbKartlar" SelectionChanged="CmbKartlar_SelectionChanged"/>
+
+        <TextBlock Text="Açıklama" Margin="0,10,0,0"/>
+        <TextBox x:Name="txtAciklama"/>
+
+        <TextBlock Text="Tutar" Margin="0,10,0,0"/>
+        <TextBox x:Name="txtTutar"/>
+
+        <TextBlock Text="Ödeme Tarihi" Margin="0,10,0,0"/>
+        <DatePicker x:Name="dpOdemeTarihi"/>
+
+        <TextBlock Text="Banka (opsiyonel)" Margin="0,10,0,0"/>
+        <TextBox x:Name="txtBanka"/>
+
+        <Button Content="Kaydet" Margin="0,20,0,0" Click="BtnKaydet_Click"/>
+    </StackPanel>
+</Window>

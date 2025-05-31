@@ -1,0 +1,49 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36109.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OdemeTakip.API", "OdemeTakip.API\OdemeTakip.API.csproj", "{11B37271-4D1D-4B02-9497-90DD0E1EF041}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OdemeTakip.Entities", "OdemeTakip.Entities\OdemeTakip.Entities.csproj", "{0C1EE88C-D820-4BCD-96A4-2C9210953447}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OdemeTakip.Business", "OdemeTakip.Business\OdemeTakip.Business.csproj", "{CA367FEB-52D7-4404-AFEB-FA56CA1A9256}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OdemeTakip.Desktop", "OdemeTakip.Desktop\OdemeTakip.Desktop.csproj", "{AFA56240-82C2-4CFA-B93A-044D841BAD26}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OdemeTakip.Data", "OdemeTakip.Data\OdemeTakip.Data.csproj", "{83829B76-51B7-A7E3-40B7-E7452A170F3A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{11B37271-4D1D-4B02-9497-90DD0E1EF041}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{11B37271-4D1D-4B02-9497-90DD0E1EF041}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{11B37271-4D1D-4B02-9497-90DD0E1EF041}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{11B37271-4D1D-4B02-9497-90DD0E1EF041}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0C1EE88C-D820-4BCD-96A4-2C9210953447}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0C1EE88C-D820-4BCD-96A4-2C9210953447}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0C1EE88C-D820-4BCD-96A4-2C9210953447}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0C1EE88C-D820-4BCD-96A4-2C9210953447}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CA367FEB-52D7-4404-AFEB-FA56CA1A9256}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CA367FEB-52D7-4404-AFEB-FA56CA1A9256}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CA367FEB-52D7-4404-AFEB-FA56CA1A9256}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CA367FEB-52D7-4404-AFEB-FA56CA1A9256}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AFA56240-82C2-4CFA-B93A-044D841BAD26}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AFA56240-82C2-4CFA-B93A-044D841BAD26}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AFA56240-82C2-4CFA-B93A-044D841BAD26}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AFA56240-82C2-4CFA-B93A-044D841BAD26}.Release|Any CPU.Build.0 = Release|Any CPU
+		{83829B76-51B7-A7E3-40B7-E7452A170F3A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{83829B76-51B7-A7E3-40B7-E7452A170F3A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{83829B76-51B7-A7E3-40B7-E7452A170F3A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{83829B76-51B7-A7E3-40B7-E7452A170F3A}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {921C83B5-FD7D-48E7-98B2-770C68B6A082}
+	EndGlobalSection
+EndGlobal

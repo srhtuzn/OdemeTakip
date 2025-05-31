@@ -1,0 +1,21 @@
+﻿<UserControl x:Class="OdemeTakip.Desktop.MiniTakvimControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Height="Auto" Width="Auto">
+    <StackPanel>
+        <TextBlock Text="🗓️ 30 Günlük Ödeme Takvimi"
+                   FontSize="16"
+                   FontWeight="Bold"
+                   Margin="10,0,0,10"/>
+
+        <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
+            <ItemsControl x:Name="lstGunler">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel Orientation="Horizontal"/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+            </ItemsControl>
+        </ScrollViewer>
+    </StackPanel>
+</UserControl>

@@ -1,0 +1,38 @@
+﻿<Window x:Class="OdemeTakip.Desktop.KrediKartiForm"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Kredi Kartı Formu" Height="600" Width="450"
+        WindowStartupLocation="CenterScreen">
+    <ScrollViewer>
+        <StackPanel Margin="20">
+            <TextBlock Text="Kart Adı:"/>
+            <TextBox x:Name="txtCardName" Margin="0 0 0 10"/>
+
+            <TextBlock Text="Sahip Türü (Şirket / Şahıs):"/>
+            <TextBox x:Name="txtOwnerType" Margin="0 0 0 10"/>
+
+            <TextBlock Text="Sahip Adı:"/>
+            <TextBox x:Name="txtOwnerName" Margin="0 0 0 10"/>
+
+            <TextBlock Text="Banka:"/>
+            <ComboBox x:Name="cmbBanka" IsEditable="False" Margin="0 0 0 10"/>
+
+            <TextBlock Text="Kart Son 4 Hane:"/>
+            <TextBox x:Name="txtCardNumberLast4" Margin="0 0 0 10" MaxLength="4"/>
+
+            <TextBlock Text="Limit (₺):"/>
+            <TextBox x:Name="txtLimit" Margin="0 0 0 10"/>
+
+            <TextBlock Text="Hesap Kesim Tarihi:"/>
+            <DatePicker x:Name="dpDueDate" Margin="0 0 0 10"/>
+
+            <TextBlock Text="Son Ödeme Tarihi:"/>
+            <DatePicker x:Name="dpPaymentDueDate" Margin="0 0 0 10"/>
+
+            <TextBlock Text="Notlar:"/>
+            <TextBox x:Name="txtNotes" Margin="0 0 0 10" Height="60" AcceptsReturn="True"/>
+
+            <Button Content="Kaydet" Width="100" HorizontalAlignment="Right" Click="BtnKaydet_Click"/>
+        </StackPanel>
+    </ScrollViewer>
+</Window>

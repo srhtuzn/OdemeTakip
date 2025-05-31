@@ -1,0 +1,47 @@
+﻿<Window x:Class="OdemeTakip.Desktop.KrediForm"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Kredi Formu" Height="600" Width="450"
+        WindowStartupLocation="CenterScreen">
+    <ScrollViewer>
+        <StackPanel Margin="20">
+            <TextBlock Text="Şirket Adı:"/>
+            <ComboBox x:Name="CmbSirketAdi" Margin="0 0 0 10"/>
+            <TextBlock Text="Banka:"/>
+            <ComboBox x:Name="cmbBanka" IsEditable="False" Margin="0 0 0 10" />
+
+            <TextBlock Text="Kredi Konusu:"/>
+            <TextBox x:Name="txtKonu" Margin="0 0 0 10"/>
+
+            <TextBlock Text="Toplam Tutar:"/>
+            <TextBox x:Name="txtToplamTutar" Margin="0 0 0 10"/>
+
+            <TextBlock Text="Taksit Sayısı:"/>
+            <TextBox x:Name="txtTaksitSayisi" Margin="0 0 0 10"/>
+
+            <TextBlock Text="Aylık Taksit Tutarı:"/>
+            <TextBox x:Name="txtAylikTaksit" Margin="0 0 0 10"/>
+
+            <TextBlock Text="Ödenen Tutar:"/>
+            <TextBox x:Name="txtOdenen" Margin="0 0 0 10"/>
+
+            <TextBlock Text="Para Birimi:"/>
+            <ComboBox x:Name="cmbParaBirimi" Margin="0 0 0 10">
+                <ComboBoxItem Content="TL"/>
+                <ComboBoxItem Content="USD"/>
+                <ComboBoxItem Content="EUR"/>
+                <ComboBoxItem Content="XAU"/>
+            </ComboBox>
+
+
+
+            <TextBlock Text="Başlangıç Tarihi:"/>
+            <DatePicker x:Name="dpBaslangic" Margin="0 0 0 10"/>
+
+            <TextBlock Text="Notlar:"/>
+            <TextBox x:Name="txtNot" Margin="0 0 0 10" Height="60" AcceptsReturn="True"/>
+
+            <Button Content="Kaydet" Width="100" HorizontalAlignment="Right" Click="BtnKaydet_Click"/>
+        </StackPanel>
+    </ScrollViewer>
+</Window>

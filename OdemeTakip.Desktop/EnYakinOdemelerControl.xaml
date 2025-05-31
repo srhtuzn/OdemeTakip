@@ -1,0 +1,48 @@
+﻿<UserControl x:Class="OdemeTakip.Desktop.EnYakinOdemelerControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Height="170" Width="420">
+
+    <Border Background="White" CornerRadius="10" Padding="10" BorderBrush="#DADADA" BorderThickness="1" SnapsToDevicePixels="True">
+        <StackPanel>
+
+            <!-- Başlık -->
+            <TextBlock Text="🕒 En Yakın 5 Ödeme"
+                       FontSize="16" FontWeight="Bold"
+                       Foreground="#333" Margin="0 0 0 10"/>
+
+            <!-- Liste -->
+            <ListView x:Name="lstOdemeler"
+                      Height="110"
+                      Background="#FAFAFA"
+                      BorderBrush="#EEE"
+                      BorderThickness="1"
+                      ScrollViewer.VerticalScrollBarVisibility="Auto">
+
+                <ListView.ItemContainerStyle>
+                    <Style TargetType="ListViewItem">
+                        <Setter Property="Padding" Value="4"/>
+                        <Setter Property="Margin" Value="0"/>
+                        <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                        <Setter Property="Background" Value="Transparent"/>
+                        <Setter Property="BorderThickness" Value="0"/>
+                        <Style.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#FFEFEFEF"/>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </ListView.ItemContainerStyle>
+
+                <ListView.View>
+                    <GridView>
+                        <GridViewColumn Header="Tarih" Width="90" DisplayMemberBinding="{Binding TarihStr}" />
+                        <GridViewColumn Header="Kod" Width="80" DisplayMemberBinding="{Binding Kod}" />
+                        <GridViewColumn Header="Açıklama" Width="160" DisplayMemberBinding="{Binding Aciklama}" />
+                        <GridViewColumn Header="Tutar" Width="80" DisplayMemberBinding="{Binding Tutar}" />
+                    </GridView>
+                </ListView.View>
+            </ListView>
+        </StackPanel>
+    </Border>
+</UserControl>

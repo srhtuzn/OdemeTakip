@@ -1,0 +1,90 @@
+﻿<UserControl
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:OdemeTakip.Desktop"
+             xmlns:vm="clr-namespace:OdemeTakip.Desktop.ViewModels"
+             xmlns:av="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" mc:Ignorable="av" x:Class="OdemeTakip.Desktop.DetayliOdemeListesiControl"
+             Height="Auto" Width="Auto" av:DesignWidth="618.5">
+
+    <StackPanel Margin="10">
+
+        <!-- Başlık -->
+        <TextBlock Text="📋 Aktif Ödeme Listesi" FontSize="20" FontWeight="Bold" Margin="0 0 0 10"/>
+
+        <!-- Arama Kutusu (ikonlu) -->
+        <Border CornerRadius="5" Background="White" BorderBrush="#CCC" BorderThickness="1" Width="594" Height="30" Margin="0 0 0 10">
+            <Grid>
+                <!-- 🔍 İkon -->
+                <TextBlock Text="🔍" FontSize="14" VerticalAlignment="Center" Margin="5,0,0,0" />
+
+                <!-- Arama Kutusu -->
+                <TextBox x:Name="txtArama"
+                 Margin="25,0,5,0"
+                 VerticalAlignment="Center"
+                 BorderThickness="0"
+                 Background="Transparent"
+                 FontSize="14"
+                 Padding="2,0,0,0"
+                 TextChanged="txtArama_TextChanged"/>
+            </Grid>
+        </Border>
+
+
+        <!-- DataGrid -->
+        <DataGrid x:Name="dgOdemeler" AutoGenerateColumns="False" CanUserAddRows="False"
+                  IsReadOnly="True" Height="550" Margin="0 10 0 0" RowHeaderWidth="0" GridLinesVisibility="Horizontal">
+
+            <!-- 🔁 Satır Renkleri -->
+            <DataGrid.RowStyle>
+                <Style TargetType="{x:Type DataGridRow}">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding KaynakModul}" Value="Sabit Ödeme">
+                            <Setter Property="Background" Value="#FFFDEFD3"/>
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding KaynakModul}" Value="Genel Ödeme">
+                            <Setter Property="Background" Value="#FFDCF4FF"/>
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding KaynakModul}" Value="Kredi">
+                            <Setter Property="Background" Value="#FFEDEDED"/>
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding KaynakModul}" Value="Kredi Kartı">
+                            <Setter Property="Background" Value="#FFFFE1E1"/>
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding KaynakModul}" Value="Çek">
+                            <Setter Property="Background" Value="#FFE1FFE1"/>
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding KaynakModul}" Value="Değişken S. Ödeme">
+                            <Setter Property="Background" Value="#FFF2E2FF"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </DataGrid.RowStyle>
+
+
+            <!-- 🔠 Kolonlar -->
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Kod" Binding="{Binding Kod}" Width="80"/>
+                <DataGridTextColumn Header="Tip" Binding="{Binding KaynakModul}" Width="120"/>
+                <DataGridTextColumn Header="Açıklama" Binding="{Binding Aciklama}" Width="*" />
+                <DataGridTextColumn Header="Tarih" Binding="{Binding Tarih, StringFormat=dd.MM.yyyy}" Width="100"/>
+                <DataGridTextColumn Header="Tutar" Binding="{Binding Tutar}" Width="120"/>
+                <DataGridTextColumn Header="Para Birimi" Binding="{Binding ParaBirimi}" Width="80"/>
+                <DataGridTextColumn Header="Ö. Tarihi" Binding="{Binding OdemeTarihi, StringFormat=dd.MM.yyyy}" Width="120"/>
+                <DataGridTextColumn Header="Ö.Banka Hesabı" Binding="{Binding OdemeBankasi}" Width="120"/>
+
+                <!-- Durum Butonu -->
+                <DataGridTemplateColumn Header="Durum" Width="100">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Button Content="{Binding OdenmeDurumu, Converter={StaticResource DurumYaziConverter}}"
+                                    Background="{Binding OdenmeDurumu, Converter={StaticResource DurumRenkConverter}}"
+                                    Foreground="White" Padding="5" FontWeight="Bold"
+                                    Tag="{Binding}" Click="BtnOdenme_Click"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+            </DataGrid.Columns>
+        </DataGrid>
+
+    </StackPanel>
+</UserControl>

@@ -1,0 +1,39 @@
+﻿<Window x:Class="OdemeTakip.Desktop.BankaHesapForm"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Banka Hesap Formu" Height="250" Width="400" WindowStartupLocation="CenterOwner">
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0" Margin="0 0 0 10">
+            <TextBlock Text="Banka Adı:"/>
+            <ComboBox x:Name="cmbBankaAdi" IsEditable="False" Margin="0 0 0 5"/>
+
+        </StackPanel>
+
+        <StackPanel Grid.Row="1" Margin="0 0 0 10">
+            <TextBlock Text="IBAN:"/>
+            <TextBox x:Name="txtIban"/>
+            
+        </StackPanel>
+
+        <StackPanel Grid.Row="2" Margin="0 0 0 10">
+            <TextBlock Text="Hesap Sahibi:"/>
+            <TextBox x:Name="txtHesapSahibi"/>
+            <StackPanel Margin="0 10 0 0">
+                <TextBlock Text="Hesap Kodu:"/>
+                <TextBox x:Name="txtKod" IsReadOnly="True"/>
+            </StackPanel>
+
+        </StackPanel>
+        
+        
+
+        <Button Content="Kaydet" Width="100" HorizontalAlignment="Right" Grid.Row="3" Click="BtnKaydet_Click"/>
+    </Grid>
+</Window>

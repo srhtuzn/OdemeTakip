@@ -1,0 +1,24 @@
+﻿<UserControl x:Class="OdemeTakip.Desktop.KrediKartiOdemeControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Grid Margin="10">
+        <StackPanel>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,0,0,10">
+                <Button Content="Yeni" Click="BtnYeni_Click" Width="80" Margin="5"/>
+                <Button Content="Düzenle" Click="BtnDuzenle_Click" Width="80" Margin="5"/>
+                <Button Content="Sil" Click="BtnSil_Click" Width="80" Margin="5"/>
+            </StackPanel>
+
+            <DataGrid x:Name="dgKrediKartiOdemeleri" AutoGenerateColumns="False" CanUserAddRows="False">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Ödeme Kodu" Binding="{Binding OdemeKodu}" Width="100"/>
+                    <DataGridTextColumn Header="Kart" Binding="{Binding KartAdi}" Width="*"/>
+                    <DataGridTextColumn Header="Açıklama" Binding="{Binding Aciklama}" Width="*"/>
+                    <DataGridTextColumn Header="Tutar" Binding="{Binding Tutar}" Width="100"/>
+                    <DataGridTextColumn Header="Tarih" Binding="{Binding OdemeTarihi, StringFormat=d}" Width="100"/>
+                </DataGrid.Columns>
+            </DataGrid>
+        </StackPanel>
+    </Grid>
+</UserControl>
+    

@@ -1,0 +1,41 @@
+﻿<Window x:Class="OdemeTakip.Desktop.CariFirmaForm"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Cari Firma Formu" Height="577" Width="450" WindowStartupLocation="CenterScreen">
+    <ScrollViewer>
+        <StackPanel Margin="20">
+            <TextBlock Text="Firma Adı:"/>
+            <TextBox x:Name="txtName" Margin="0 0 0 10"/>
+
+            <TextBlock Text="Vergi No:"/>
+            <TextBox x:Name="txtTaxNumber" Margin="0 0 0 10"/>
+
+            <TextBlock Text="Vergi Dairesi:"/>
+            <TextBox x:Name="txtTaxOffice" Margin="0 0 0 10"/>
+
+            <TextBlock Text="Telefon:"/>
+            <TextBox x:Name="txtPhone" Margin="0 0 0 10"/>
+
+            <TextBlock Text="E-Posta:"/>
+            <TextBox x:Name="txtEmail" Margin="0 0 0 10"/>
+
+            <TextBlock Text="IBAN:"/>
+            <TextBox x:Name="txtIban" Margin="0 0 0 10"/>
+
+            <TextBlock Text="Banka:"/>
+            <ComboBox x:Name="cmbBanka" IsEditable="False" Margin="0 0 0 10"/>
+
+
+            <TextBlock Text="Yetkili Kişi:"/>
+            <TextBox x:Name="txtContact" Margin="0 0 0 10"/>
+
+            <TextBlock Text="Adres:"/>
+            <TextBox x:Name="txtAddress" Margin="0 0 0 10" AcceptsReturn="True" Height="50"/>
+
+            <TextBlock Text="Notlar:"/>
+            <TextBox x:Name="txtNotes" Margin="0 0 0 10" AcceptsReturn="True" Height="50"/>
+
+            <Button Content="Kaydet" Width="100" HorizontalAlignment="Right" Click="BtnKaydet_Click"/>
+        </StackPanel>
+    </ScrollViewer>
+</Window>
