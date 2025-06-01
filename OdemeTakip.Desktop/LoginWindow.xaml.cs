@@ -1,8 +1,12 @@
-﻿using System.Windows;
+﻿
+// LoginWindow.xaml.cs
+using System;
 using System.Linq;
+using System.Security.Cryptography;
+using System.Text;
+using System.Windows;
 using OdemeTakip.Data;
-using Microsoft.EntityFrameworkCore;
-using OdemeTakip.Entities; // User entity burada
+using OdemeTakip.Entities;
 
 namespace OdemeTakip.Desktop
 {
@@ -11,36 +15,47 @@ namespace OdemeTakip.Desktop
         public LoginWindow()
         {
             InitializeComponent();
-
-            // Beni Hatırla varsa doldur
-            if (Properties.Settings.Default.RememberMe && !string.IsNullOrEmpty(Properties.Settings.Default.Username))
+            LoadUserSettings();
+        }
+        private void LoadUserSettings()
+        {
+            if (Properties.Settings.Default.RememberMe)
             {
-                UsernameTextBox.Text = Properties.Settings.Default.Username;
                 RememberMeCheckBox.IsChecked = true;
+                UsernameTextBox.Text = Properties.Settings.Default.Username;
+                // İsteğe bağlı: Kullanıcı adı doluysa şifre kutusuna odaklan
+                if (!string.IsNullOrEmpty(UsernameTextBox.Text))
+                {
+                    PasswordBox.Focus();
+                }
             }
         }
 
         private void LoginButton_Click(object sender, RoutedEventArgs e)
         {
-            string username = UsernameTextBox.Text.Trim();
-            string password = PasswordBox.Password;
-
-            if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password))
+            if (string.IsNullOrWhiteSpace(UsernameTextBox.Text) || string.IsNullOrWhiteSpace(PasswordBox.Password))
             {
-                MessageBox.Show("Kullanıcı adı ve şifre giriniz.", "Eksik Bilgi", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
-            // Kullanıcı kontrolü
+            var username = UsernameTextBox.Text.Trim();
+            var password = PasswordBox.Password.Trim();
+
             var user = App.DbContext.Users.FirstOrDefault(u => u.Username == username);
 
-            if (user == null || user.PasswordHash != HashPassword(password))
+            if (user == null)
             {
-                MessageBox.Show("Kullanıcı adı veya şifre hatalı.", "Giriş Başarısız", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
 
-            // Beni hatırla kaydet
+            string hashedInputPassword = HashPassword(password);
+
+            if (user.PasswordHash != hashedInputPassword)
+            {
+                return;
+            }
+            App.SetCurrentUser(user);
+
             if (RememberMeCheckBox.IsChecked == true)
             {
                 Properties.Settings.Default.RememberMe = true;
@@ -54,24 +69,25 @@ namespace OdemeTakip.Desktop
                 Properties.Settings.Default.Save();
             }
 
-            // Giriş başarılı
             this.DialogResult = true;
             this.Close();
         }
 
-        private static string HashPassword(string password)
+        public static string HashPassword(string password)
         {
-            using (var sha256 = System.Security.Cryptography.SHA256.Create())
-            {
-                var bytes = System.Text.Encoding.UTF8.GetBytes(password);
-                var hash = sha256.ComputeHash(bytes);
-                return Convert.ToBase64String(hash);
-            }
+            var bytes = Encoding.UTF8.GetBytes(password);
+            var hash = SHA256.HashData(bytes);
+            return Convert.ToBase64String(hash);
         }
 
-        private void ForgotPassword_Click(object sender, RoutedEventArgs e)
+        private void ForgotPassword_Hyperlink_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show("Parola sıfırlama için sistem yöneticinizle iletişime geçin.", "Parolamı Unuttum", MessageBoxButton.OK, MessageBoxImage.Information);
+            ForgotPasswordWindow forgotPasswordWindow = new() // IDE0090 da uygulanmış
+            {
+                Owner = this
+                // , SomeOtherProperty = value
+            };
+            forgotPasswordWindow.ShowDialog();
         }
     }
 }
