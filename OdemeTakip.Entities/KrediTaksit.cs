@@ -16,4 +16,5 @@ public class KrediTaksit
     public bool OdenmeDurumu { get; set; } = false;
     public DateTime? OdenmeTarihi { get; set; }
     public string? OdemeBankasi { get; set; }
+    public string? OdeyenKullaniciAdi { get; set; }
 }

@@ -21,6 +21,9 @@ namespace OdemeTakip.Desktop.ViewModels
 
         // 👇 Her modülde ortaklaştırılmış, şirket veya şahıs olabilir
         public string? SirketAdi { get; set; }
+        public string? OdeyenKullaniciAdi { get; set; } = ""; // Ödeme yapan kullanıcının adı
+        public int Id { get; set; } // Entity'nin asıl Primary Key'i için
+        public int KaynakId { get; set; } // Hangi entity'den geldiğini belirtmek için (genellikle Id ile aynı olabilir)
     }
 
 }

@@ -21,21 +21,74 @@ namespace OdemeTakip.Desktop
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            if (App.CurrentUser != null && App.CurrentUser.Role == UserRole.Admin)
             {
-                UserManagementPanelView umView = new(); // IDE0090 Düzeltmesi
-                TabItem userManagementTab = new()      // IDE0090 Düzeltmesi (nesne başlatıcı ile birleşebilir)
+                if (App.CurrentUser != null)
                 {
-                    Name = "UserManagementTab",
+                    // Kullanıcı bilgilerini MainWindow'daki TextBlock'lara yükle
+                    // Bu TextBlock'ların MainWindow.xaml'de tanımlı olduğundan emin olun:
+                    // x:Name="LoggedInUserFullNameTextBlock" ve x:Name="LoggedInUserRoleTextBlock"
+                    // Eğer bu TextBlock'lar yoksa, XAML'e eklemeniz veya bu satırları kaldırmanız gerekir.
+                    // Önceki XAML önerilerimde bu TextBlock'lar vardı.
+                    if (this.FindName("LoggedInUserFullNameTextBlock") is TextBlock fullNameTextBlock)
+                    {
+                        fullNameTextBlock.Text = App.CurrentUser.FullName ?? App.CurrentUser.Username;
+                    }
+                    if (this.FindName("LoggedInUserRoleTextBlock") is TextBlock roleTextBlock)
+                    {
+                        roleTextBlock.Text = App.CurrentUser.Role.ToString();
+                    }
+
+                    // Kullanıcı rolüne göre Kullanıcı Yönetimi butonunun/sekmesinin görünürlüğünü ayarla
+                    if (App.CurrentUser.Role == UserRole.Admin)
+                    {
+                        // Eğer buton kullanıyorsanız (XAML'de UserManagementButton varsa):
+                        if (this.FindName("UserManagementButton") is Button umButton)
+                        {
+                            umButton.Visibility = Visibility.Visible;
+                        }
+                        // VEYA doğrudan sekme ekliyorsanız:
+                        AddUserManagementTabIfNeeded();
+                    }
+                    else
+                    {
+                        if (this.FindName("UserManagementButton") is Button umButton)
+                        {
+                            umButton.Visibility = Visibility.Collapsed;
+                        }
+                        // Admin değilse Kullanıcı Yönetimi sekmesi eklenmez.
+                    }
+                }
+                else
+                {
+                    // Bu durum OnStartup'taki kontrolle engellenmeli, ancak bir güvenlik önlemi olarak:
+                    MessageBox.Show("Oturum bilgileri yüklenemedi. Lütfen tekrar giriş yapın.", "Oturum Hatası", MessageBoxButton.OK, MessageBoxImage.Error);
+                    LogoutAndShowLogin(); // Oturumu kapat ve login ekranını göster
+                    return;
+                }
+
+                // Mevcut diğer Window_Loaded işlemleriniz
+                var db = App.DbContext;
+                BankaSeeder.Yukle(db);
+                DegiskenOdemeGenerator.Uygula(db);
+            }
+        }
+        private void AddUserManagementTabIfNeeded()
+        {
+            string userManagementTabName = "UserManagementTab";
+            // Sekmenin zaten ekli olup olmadığını kontrol et
+            if (MainTabControl.Items.OfType<TabItem>().All(ti => ti.Name != userManagementTabName))
+            {
+                // UserManagementPanelView'ın namespace'inin doğru olduğundan emin olun
+                // Örneğin: using OdemeTakip.Desktop.ViewModels;
+                UserManagementPanelView umView = new ();
+                TabItem userManagementTab = new ()
+                {
+                    Name = userManagementTabName,
                     Header = "👤 Kullanıcı Yönetimi",
                     Content = umView
                 };
                 MainTabControl.Items.Add(userManagementTab);
             }
-
-            var db = App.DbContext;
-            BankaSeeder.Yukle(db);
-            DegiskenOdemeGenerator.Uygula(db);
         }
         private void LogoutButton_Click(object sender, RoutedEventArgs e)
         {

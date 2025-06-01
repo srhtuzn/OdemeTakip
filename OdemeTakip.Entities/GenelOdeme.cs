@@ -22,6 +22,7 @@ namespace OdemeTakip.Entities
 
         public bool IsOdedildiMi { get; set; } = false;
         public bool IsActive { get; set; } = true;
+        public string? OdeyenKullaniciAdi { get; set; }
         public string? FaturaNo { get; set; } // Opsiyonel fatura no (fatura aramalarına uygun)
     }
 }

@@ -27,6 +27,7 @@ namespace OdemeTakip.Entities
         public bool OdenmeDurumu { get; set; } = false;
 
         public bool IsActive { get; set; } = true;
+        public string? OdeyenKullaniciAdi { get; set; }
     }
 
 

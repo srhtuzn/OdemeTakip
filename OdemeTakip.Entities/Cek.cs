@@ -34,6 +34,7 @@ namespace OdemeTakip.Entities
         public string? ParaBirimi { get; set; }
         public int? CariFirmaId { get; set; }
         public CariFirma? CariFirma { get; set; }
+        public string? OdeyenKullaniciAdi { get; set; }
 
     }
 }

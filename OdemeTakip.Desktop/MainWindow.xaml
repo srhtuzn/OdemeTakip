@@ -13,12 +13,6 @@
 
         <Border Grid.Row="0" BorderBrush="LightGray" BorderThickness="0,0,0,1" Padding="5,8">
             <DockPanel LastChildFill="False">
-                <Button x:Name="UserManagementButton" 
-                        Content="👤 Kullanıcı Yönetimi" 
-                        Click="UserManagementButton_Click" 
-                        Visibility="Collapsed"  
-                        Padding="10,5" MinWidth="150" FontWeight="Medium" Margin="0,0,10,0"
-                        DockPanel.Dock="Left"/>
 
                 <Button x:Name="LogoutButton" 
                         Content="🚪 Oturumu Kapat" 
