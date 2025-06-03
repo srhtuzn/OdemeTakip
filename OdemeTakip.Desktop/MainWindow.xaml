@@ -71,8 +71,12 @@
                     <TabItem Header="Ödeme Kayıtları">
                         <local:KrediKartiOdemeControl x:Name="krediKartiOdemeControl"/>
                     </TabItem>
+                    <TabItem Header="Taksitli Ödeme Girişi">
+                        <local:KrediKartiTaksitliOdemeControl />
+                    </TabItem>
                 </TabControl>
             </TabItem>
+
         </TabControl>
     </Grid>
 </Window>

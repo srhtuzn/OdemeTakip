@@ -13,8 +13,8 @@ namespace OdemeTakip.Entities
         public string? OdemeKodu { get; set; }
         public string? OdemeBankasi { get; set; }
 
-        public int? CompanyId { get; set; }  // 🔥 Şirket FK
-        public Company? Company { get; set; }  // 🔥 Şirket Navigation
+        public int? CompanyId { get; set; }
+        public Company? Company { get; set; }
 
         public string? KartAdi { get; set; }
         public string? Aciklama { get; set; }
@@ -28,7 +28,13 @@ namespace OdemeTakip.Entities
 
         public bool IsActive { get; set; } = true;
         public string? OdeyenKullaniciAdi { get; set; }
+
+        // 🔥 Yeni Alanlar (Taksit İçin)
+        public int? TaksitNo { get; set; }
+        public int? ToplamTaksit { get; set; }
+        public DateTime? IlkOdemeTarihi { get; set; }
     }
+
 
 
 }

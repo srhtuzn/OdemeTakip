@@ -16,7 +16,8 @@ namespace OdemeTakip.Desktop
 {
     public partial class TumOdemelerView : UserControl
     {
-        private List<OdemeViewModel> tumOdemelerSource = new    ();
+        private readonly List<OdemeViewModel> _tumOdemelerSource = new();
+
 
         public TumOdemelerView()
         {
@@ -52,53 +53,29 @@ namespace OdemeTakip.Desktop
 
         private void ApplyClientSideFilter()
         {
-            if (DgOdemeler == null || tumOdemelerSource == null) return;
+            if (DgOdemeler == null) return;
 
-            string filtreMetni = TxtArama.Text.Trim().ToLower();
+            string filtreMetni = TxtArama.Text.Trim();
             ICollectionView view = CollectionViewSource.GetDefaultView(DgOdemeler.ItemsSource);
-            if (view == null && DgOdemeler.ItemsSource != null) // Eğer varsayılan view yoksa ama kaynak varsa
-            {
-                // Bu genellikle olmaz ama ItemsSource doğrudan List<T> ise olabilir.
-                // Bu durumda, ItemsSource'u her filtrelemede yeniden atamak daha basit olabilir.
-                // Ya da ItemsSource'a ObservableCollection atayıp onun üzerinden filtrelemek.
-                // Şimdilik, FiltreleVeYukle'nin sonunda yapılan atamayı varsayıyoruz.
-            }
-
 
             if (string.IsNullOrEmpty(filtreMetni))
             {
                 if (view != null) view.Filter = null;
-                // Eğer view null ise ve direkt ItemsSource'a atama yapıyorsak,
-                // ana listeyi (filtrelenmiş ödeme durumuna göre) tekrar atamalıyız.
-                // FiltreleVeYukle zaten doğru listeyi yüklüyor olmalı.
             }
             else
             {
-                // Eğer ItemsSource bir ICollectionView ise:
                 if (view != null)
                 {
-                    view.Filter = item =>
-                    {
-                        if (item is OdemeViewModel vm)
-                        {
-                            return (vm.Kod?.ToLower().Contains(filtreMetni) ?? false) ||
-                                   (vm.Aciklama?.ToLower().Contains(filtreMetni) ?? false) ||
-                                   (vm.KaynakModul?.ToLower().Contains(filtreMetni) ?? false) ||
-                                   (vm.SirketAdi?.ToLower().Contains(filtreMetni) ?? false) ||
-                                   (vm.OdeyenKullaniciAdi?.ToLower().Contains(filtreMetni) ?? false);
-                        }
-                        return false;
-                    };
-                }
-                else
-                {
-                    // Eğer ItemsSource direkt List<T> ise, bu şekilde anlık filtreleme için
-                    // Filtrelenmiş yeni bir liste oluşturup ItemsSource'a atamak gerekir.
-                    // Bu, FiltreleVeYukle'nin bir parçası olarak ele alınabilir.
-                    // Şimdilik, ana filtreleme FiltreleVeYukle'den gelecek.
+                    view.Filter = item => item is OdemeViewModel vm &&
+                        (vm.Kod?.Contains(filtreMetni, StringComparison.OrdinalIgnoreCase) == true ||
+                         vm.Aciklama?.Contains(filtreMetni, StringComparison.OrdinalIgnoreCase) == true ||
+                         vm.KaynakModul?.Contains(filtreMetni, StringComparison.OrdinalIgnoreCase) == true ||
+                         vm.SirketAdi?.Contains(filtreMetni, StringComparison.OrdinalIgnoreCase) == true ||
+                         vm.OdeyenKullaniciAdi?.Contains(filtreMetni, StringComparison.OrdinalIgnoreCase) == true);
                 }
             }
         }
+
 
 
         public void FiltreleVeYukle()
@@ -106,273 +83,207 @@ namespace OdemeTakip.Desktop
             var db = App.DbContext;
             if (db == null)
             {
-                MessageBox.Show("Veritabanı bağlantısı (DbContext) bulunamadı.", "Kritik Hata", MessageBoxButton.OK, MessageBoxImage.Error);
-                tumOdemelerSource.Clear();
-                if (DgOdemeler != null) DgOdemeler.ItemsSource = null;
+                MessageBox.Show("Veritabanı bağlantısı bulunamadı.", "Kritik Hata", MessageBoxButton.OK, MessageBoxImage.Error);
+                _tumOdemelerSource.Clear();
+                DgOdemeler.ItemsSource = null;
                 return;
             }
-            tumOdemelerSource.Clear();
 
+            _tumOdemelerSource.Clear();
             DateTime simdi = DateTime.Today;
-            int currentYear = simdi.Year;
-            int currentMonth = simdi.Month;
-            int currentDay = simdi.Day;
 
-            bool? odemeDurumuFiltresi = null;
-            if (CmbOdemeDurumu.SelectedItem is ComboBoxItem selectedDurumItem)
+            bool? odemeDurumuFiltresi = CmbOdemeDurumu.SelectedItem switch
             {
-                if (selectedDurumItem.Content.ToString() == "Ödenecekler")
-                    odemeDurumuFiltresi = false;
-                else if (selectedDurumItem.Content.ToString() == "Ödenmişler")
-                    odemeDurumuFiltresi = true;
-                // "Tümü" seçeneği null kalır, filtreleme yapılmaz
-            }
+                ComboBoxItem item when item.Content.ToString() == "Ödenecekler" => false,
+                ComboBoxItem item when item.Content.ToString() == "Ödenmişler" => true,
+                _ => null
+            };
 
-            // ----- Sabit Giderler -----   
-            var aktifSabitGiderSablonalari = db.SabitGiderler.AsNoTracking()
-    .Include(x => x.Company)
-    .Where(x => x.IsActive)
-    .ToList();
+            // Çekler
+            _tumOdemelerSource.AddRange(db.Cekler.AsNoTracking()
+                .Include(x => x.CariFirma)
+                .Where(x => x.IsActive && (!odemeDurumuFiltresi.HasValue || x.OdenmeDurumu == odemeDurumuFiltresi))
+                .Select(MapCek));
 
-            foreach (var giderSablonu in aktifSabitGiderSablonalari)
-            {
-                if (!giderSablonu.OtomatikMi)
-                {
-                    DateTime vadeTarihi = giderSablonu.BaslangicTarihi;
-                    bool odendiMi = giderSablonu.OdendiMi;
-
-                    // 🔥 Tarih filtresi sadece ödenecekler/ödenmişler filtresi seçiliyse çalışacak
-                    bool tarihSarti = true;
-
-                    if (odemeDurumuFiltresi.HasValue)
-                    {
-                        tarihSarti = (vadeTarihi.Year < currentYear) ||
-                                     (vadeTarihi.Year == currentYear && vadeTarihi.Month < currentMonth) ||
-                                     (vadeTarihi.Year == currentYear && vadeTarihi.Month == currentMonth && vadeTarihi.Day <= currentDay);
-                    }
-
-                    if ((!odemeDurumuFiltresi.HasValue || odemeDurumuFiltresi.Value == odendiMi) && tarihSarti)
-                    {
-                        // 🔥 Tümü seçiliyse veya uygun ödeme durumu ve tarih kontrolü sağlanıyorsa ekle
-                        tumOdemelerSource.Add(new OdemeViewModel
-                        {
-                            Id = giderSablonu.Id,
-                            KaynakId = giderSablonu.Id,
-                            Kod = giderSablonu.OdemeKodu ?? string.Empty,
-                            Aciklama = giderSablonu.GiderAdi ?? string.Empty,
-                            Tarih = vadeTarihi,
-                            Tutar = giderSablonu.Tutar,
-                            ParaBirimi = giderSablonu.ParaBirimi ?? "TL",
-                            KaynakModul = "Sabit Ödeme",
-                            OdenmeDurumu = odendiMi,
-                            SirketAdi = giderSablonu.Company?.Name ?? string.Empty,
-                            FaturaNo = giderSablonu.FaturaNo,
-                            OdeyenKullaniciAdi = giderSablonu.OdeyenKullaniciAdi
-                        });
-                    }
-                }
-                else // Otomatik sabit giderler
-                {
-                    DateTime iterTarih = giderSablonu.BaslangicTarihi;
-                    // Ödenmişler için çok ileriye bakmaya gerek yok, "Tümü" veya "Ödenecekler" için 2 ay ileriye bakılır.
-                    DateTime gelecekKontrolLimiti = odemeDurumuFiltresi == true ? simdi.AddMonths(1) : simdi.AddMonths(2);
-
-                    while (iterTarih < gelecekKontrolLimiti)
-                    {
-                        // Sadece içinde bulunulan ay veya geçmiş aylardaki ödemeler dikkate alınır.
-                        if ((iterTarih.Year < currentYear) || (iterTarih.Year == currentYear && iterTarih.Month <= currentMonth))
-                        {
-                            // İlgili periyoda ait ödeme kaydı veritabanında var mı kontrol edilir.
-                            var instancePayment = db.SabitGiderler.AsNoTracking()
-                                .FirstOrDefault(sg => sg.OdemeKodu == giderSablonu.OdemeKodu && sg.BaslangicTarihi == iterTarih && sg.OtomatikMi == true);
-                            bool buPeriyotOdendi = instancePayment != null && instancePayment.OdendiMi;
-
-                            // DÜZELTİLMİŞ KISIM:
-                            // Eğer "Tümü" seçiliyse (odemeDurumuFiltresi.HasValue false ise) VEYA
-                            // ödeme durumu filtreyle eşleşiyorsa (odemeDurumuFiltresi.Value == buPeriyotOdendi)
-                            // listeye ekle.
-                            if (!odemeDurumuFiltresi.HasValue || odemeDurumuFiltresi.Value == buPeriyotOdendi)
-                            {
-                                // "Tümü" filtresinin hatalı çalışmasına neden olan
-                                // "if (!buPeriyotOdendi || odemeDurumuFiltresi == true)" koşulu buradan kaldırıldı.
-                                tumOdemelerSource.Add(new OdemeViewModel
-                                {
-                                    Id = instancePayment?.Id ?? giderSablonu.Id, // Veritabanında kayıt varsa onun Id'si, yoksa şablon Id'si
-                                    KaynakId = giderSablonu.Id, // Her zaman ana şablonun Id'si
-                                    Kod = giderSablonu.OdemeKodu ?? string.Empty,
-                                    // Açıklamadaki tarih formatı "MMMM yyyy" (örn: Haziran 2025) olarak düzeltildi.
-                                    Aciklama = $"{giderSablonu.GiderAdi} ({iterTarih:MMMM yyyy})",
-                                    Tarih = iterTarih,
-                                    Tutar = giderSablonu.Tutar,
-                                    ParaBirimi = giderSablonu.ParaBirimi ?? "TL",
-                                    KaynakModul = "Sabit Ödeme",
-                                    OdenmeDurumu = buPeriyotOdendi,
-                                    SirketAdi = giderSablonu.Company != null ? (giderSablonu.Company.Name ?? string.Empty) : string.Empty,
-                                    FaturaNo = giderSablonu.FaturaNo, // Şablondan gelen fatura no. Instance'a özel FaturaNo varsa farklı bir mantık gerekebilir.
-                                    OdeyenKullaniciAdi = instancePayment?.OdeyenKullaniciAdi
-                                });
-                            }
-                        }
-
-                        // Bir sonraki periyodun tarihini hesapla
-                        if (string.IsNullOrWhiteSpace(giderSablonu.Periyot) || (iterTarih.Year > gelecekKontrolLimiti.Year + 1)) break; // Güvenlik ve sonsuz döngü önlemi
-                        iterTarih = giderSablonu.Periyot switch
-                        {
-                            "Aylık" => iterTarih.AddMonths(1),
-                            "3 Aylık" => iterTarih.AddMonths(3),
-                            "Yıllık" => iterTarih.AddYears(1),
-                            _ => DateTime.MaxValue // Bilinmeyen periyot durumunda döngüden çık
-                        };
-                        if (iterTarih == DateTime.MaxValue) break; // Geçersiz tarih ise döngüden çık
-                    }
-                }
-            }
-
-            // ----- Genel Ödemeler -----
-            tumOdemelerSource.AddRange(db.GenelOdemeler.AsNoTracking()
+            // Genel Ödemeler
+            _tumOdemelerSource.AddRange(db.GenelOdemeler.AsNoTracking()
                 .Include(x => x.Company)
-                .Where(x => x.IsActive &&
-                            (!odemeDurumuFiltresi.HasValue || x.IsOdedildiMi == odemeDurumuFiltresi.Value) &&
-                            x.OdemeTarihi.HasValue &&
-                            ((x.OdemeTarihi.Value.Year < currentYear) ||
-                             (x.OdemeTarihi.Value.Year == currentYear && x.OdemeTarihi.Value.Month <= currentMonth)))
-                .Select(x => new OdemeViewModel
-                { /* ... alanlar ... OdenmeDurumu = x.IsOdedildiMi, OdeyenKullaniciAdi = x.OdeyenKullaniciAdi */
-                    Id = x.Id,
-                    KaynakId = x.Id,
-                    Kod = x.OdemeKodu ?? string.Empty,
-                    Aciklama = x.Aciklama ?? string.Empty,
-                    Tarih = x.OdemeTarihi.Value,
-                    Tutar = x.Tutar,
-                    ParaBirimi = x.ParaBirimi ?? "TL",
-                    KaynakModul = "Genel Ödeme",
-                    OdenmeDurumu = x.IsOdedildiMi,
-                    SirketAdi = x.Company != null ? (x.Company.Name ?? string.Empty) : string.Empty,
-                    FaturaNo = x.FaturaNo,
-                    OdeyenKullaniciAdi = x.OdeyenKullaniciAdi
-                }));
+                .Include(x => x.CariFirma) // ✅ EKLENDİ
+                .Where(x => x.IsActive && (!odemeDurumuFiltresi.HasValue || x.IsOdedildiMi == odemeDurumuFiltresi))
+                .Select(MapGenelOdeme));
 
-            // ----- Kredi Taksitleri -----
-            var tumAktifKrediTaksitleri = db.KrediTaksitler.AsNoTracking()
-               .Include(x => x.Kredi)
-               .Where(x => x.Kredi != null && x.Kredi.IsActive &&
-                           (!odemeDurumuFiltresi.HasValue || x.OdenmeDurumu == odemeDurumuFiltresi.Value))
-               .ToList();
-            var gosterilecekKrediTaksitleri = tumAktifKrediTaksitleri
-                .Where(t => (t.Tarih.Year < currentYear) || (t.Tarih.Year == currentYear && t.Tarih.Month <= currentMonth))
-                // Ödenmemişler için sadece en yakınını, ödenmişler için tümünü (veya bir tarih aralığını) alabilirsiniz.
-                // Şimdilik basitlik adına, ödenmemişlerin ilkini, ödenmişlerin hepsini (filtrelenmiş) alalım.
+            // Değişken Ödemeler
+            _tumOdemelerSource.AddRange(db.DegiskenOdemeler.AsNoTracking()
+                .Include(x => x.Company)
+                .Include(x => x.CariFirma) // ✅ EKLENDİ
+                .Where(x => x.IsActive && (!odemeDurumuFiltresi.HasValue || x.OdenmeDurumu == odemeDurumuFiltresi))
+                .Select(MapDegiskenOdeme));
+
+            // Kredi — Her Kredi'den sadece ilk ödenmemiş
+            var krediTaksitler = db.KrediTaksitler.AsNoTracking()
+                .Include(x => x.Kredi)
+                .Where(x => x.Kredi.IsActive && (!odemeDurumuFiltresi.HasValue || x.OdenmeDurumu == odemeDurumuFiltresi))
+                .AsEnumerable()
                 .GroupBy(x => x.KrediId)
-                .SelectMany(g => odemeDurumuFiltresi == false ?
-                                 g.Where(t => !t.OdenmeDurumu).OrderBy(t => t.Tarih).Take(1) :
-                                 g.Where(t => odemeDurumuFiltresi == true ? t.OdenmeDurumu : true) // Tümü veya ödenmişler
-                )
+                .Select(g => g.OrderBy(t => t.Tarih).FirstOrDefault())
                 .Where(t => t != null)
-                .ToList();
-            foreach (var taksit in gosterilecekKrediTaksitleri)
-            {
-                tumOdemelerSource.Add(new OdemeViewModel
-                { /* ... alanlar ... OdenmeDurumu = taksit.OdenmeDurumu, OdeyenKullaniciAdi = taksit.OdeyenKullaniciAdi */
-                    Id = taksit.Id,
-                    KaynakId = taksit.Id,
-                    Kod = $"{taksit.KrediKodu}-T{taksit.TaksitNo:D2}",
-                    Aciklama = $"{(taksit.Kredi != null ? taksit.Kredi.KrediKonusu : "")} (Taksit {taksit.TaksitNo})",
-                    Tarih = taksit.Tarih,
-                    Tutar = taksit.Tutar,
-                    ParaBirimi = (taksit.Kredi != null ? taksit.Kredi.ParaBirimi : null) ?? "TL",
-                    KaynakModul = "Kredi",
-                    OdenmeDurumu = taksit.OdenmeDurumu,
-                    OdemeTarihi = taksit.OdenmeTarihi,
-                    OdemeBankasi = taksit.OdemeBankasi,
-                    SirketAdi = (taksit.Kredi != null ? taksit.Kredi.SirketAdi : null) ?? string.Empty,
-                    OdeyenKullaniciAdi = taksit.OdeyenKullaniciAdi
-                });
-            }
+                .Select(t => MapKrediTaksit(t!));
 
-            // ----- Kredi Kartı Ödemeleri -----
-            tumOdemelerSource.AddRange(
-                db.KrediKartiOdemeleri
-                    .AsNoTracking()
-                    .Include(x => x.Company) // 🔥 FK Company çekiyoruz
-                    .Where(x => x.IsActive &&
-                                (!odemeDurumuFiltresi.HasValue || x.OdenmeDurumu == odemeDurumuFiltresi.Value) &&
-                                x.OdemeTarihi.HasValue &&
-                                ((x.OdemeTarihi.Value.Year < currentYear) ||
-                                 (x.OdemeTarihi.Value.Year == currentYear && x.OdemeTarihi.Value.Month <= currentMonth)))
-                    .Select(x => new OdemeViewModel
-                    {
-                        Id = x.Id,
-                        KaynakId = x.Id,
-                        Kod = x.OdemeKodu ?? string.Empty,
-                        Aciklama = x.Aciklama ?? string.Empty,
-                        Tarih = x.OdemeTarihi.Value,
-                        Tutar = x.Tutar,
-                        ParaBirimi = "TL",
-                        KaynakModul = "Kredi Kartı",
-                        OdenmeDurumu = x.OdenmeDurumu,
-                        SirketAdi = x.Company != null ? (x.Company.Name ?? string.Empty) : string.Empty, // 🔥 Değişen burası
-                        OdeyenKullaniciAdi = x.OdeyenKullaniciAdi
-                    })
-            );
+            _tumOdemelerSource.AddRange(krediTaksitler);
 
+            // Sabit Ödeme — Her şablondan sadece ilk ödenmemiş
+            var sabitGiderler = db.SabitGiderler.AsNoTracking()
+                .Include(x => x.Company)
+                .Include(x => x.CariFirma) // ✅ EKLENDİ
+                .Where(x => x.IsActive && (!odemeDurumuFiltresi.HasValue || x.OdendiMi == odemeDurumuFiltresi))
+                .AsEnumerable()
+                .GroupBy(x => x.OdemeKodu)
+                .Select(g => g.OrderBy(t => t.BaslangicTarihi).FirstOrDefault())
+                .Where(t => t != null)
+                .Select(g => MapSabitGider(g!, g!.BaslangicTarihi, g.OdendiMi));
 
-            // ----- Çekler -----
-            tumOdemelerSource.AddRange(
-                db.Cekler.AsNoTracking()
-                    .Include(x => x.CariFirma) // 🔥 CariFirma ilişkisini çekiyoruz
-                    .Where(x => x.IsActive &&
-                                (!odemeDurumuFiltresi.HasValue || x.OdenmeDurumu == odemeDurumuFiltresi.Value) &&
-                                ((x.VadeTarihi.Year < currentYear) ||
-                                 (x.VadeTarihi.Year == currentYear && x.VadeTarihi.Month <= currentMonth)))
-                    .Select(x => new OdemeViewModel
-                    {
-                        Id = x.Id,
-                        KaynakId = x.Id,
-                        Kod = x.CekKodu ?? string.Empty,
-                        Aciklama = $"Çek No: {x.CekNumarasi}",
-                        Tarih = x.VadeTarihi,
-                        Tutar = x.Tutar,
-                        ParaBirimi = x.ParaBirimi ?? "TL",
-                        KaynakModul = "Çek",
-                        OdenmeDurumu = x.OdenmeDurumu,
-                        SirketAdi = x.CariFirma != null ? (x.CariFirma.Name ?? string.Empty) : string.Empty, // 🔥 Burada SirketAdi = CariFirma.Name
-                        OdeyenKullaniciAdi = x.OdeyenKullaniciAdi
-                    })
-            );
+            _tumOdemelerSource.AddRange(sabitGiderler);
 
+            // Kredi Kartı — Şirket ve Kart bazlı bu ayın kaydı
+            var ayBaslangic = new DateTime(simdi.Year, simdi.Month, 1);
+            var aySonu = ayBaslangic.AddMonths(1).AddDays(-1);
 
-            // ----- Değişken Ödemeler -----
-            tumOdemelerSource.AddRange(db.DegiskenOdemeler.AsNoTracking()
+            var krediKartiOdemeler = db.KrediKartiOdemeleri.AsNoTracking()
                 .Include(x => x.Company)
                 .Where(x => x.IsActive &&
-                            (!odemeDurumuFiltresi.HasValue || x.OdenmeDurumu == odemeDurumuFiltresi.Value) &&
-                            ((x.OdemeTarihi.Year < currentYear) ||
-                             (x.OdemeTarihi.Year == currentYear && x.OdemeTarihi.Month <= currentMonth)))
-                .Select(x => new OdemeViewModel
-                { /* ... alanlar ... OdenmeDurumu = x.OdenmeDurumu, OdeyenKullaniciAdi = x.OdeyenKullaniciAdi */
-                    Id = x.Id,
-                    KaynakId = x.Id,
-                    Kod = x.OdemeKodu,
-                    Aciklama = x.GiderTuru + (string.IsNullOrWhiteSpace(x.Aciklama) ? "" : $" - {x.Aciklama}"),
-                    Tarih = x.OdemeTarihi,
-                    Tutar = x.Tutar,
-                    ParaBirimi = x.ParaBirimi ?? "TL",
-                    KaynakModul = "Değişken S. Ödeme",
-                    OdenmeDurumu = x.OdenmeDurumu,
-                    OdemeTarihi = x.OdemeTarihi,
-                    OdemeBankasi = x.OdemeBankasi,
-                    SirketAdi = x.Company != null ? (x.Company.Name ?? string.Empty) : string.Empty,
-                    FaturaNo = x.FaturaNo,
-                    OdeyenKullaniciAdi = x.OdeyenKullaniciAdi
-                }));
+                            (!odemeDurumuFiltresi.HasValue || x.OdenmeDurumu == odemeDurumuFiltresi) &&
+                            x.OdemeTarihi >= ayBaslangic && x.OdemeTarihi <= aySonu)
+                .Select(MapKrediKartiOdeme);
+
+            _tumOdemelerSource.AddRange(krediKartiOdemeler);
 
             if (DgOdemeler != null)
-            {
-                DgOdemeler.ItemsSource = tumOdemelerSource.OrderBy(x => x.Tarih).ToList();
-            }
-            // DataGrid yüklendikten sonra seçili bir öğe varsa "Sonraki Taksitler" expander'ını güncelle
-            HandleDataGridSelectionChanged();
+                DgOdemeler.ItemsSource = _tumOdemelerSource.OrderBy(x => x.Tarih).ToList();
         }
+
+
+        private static OdemeViewModel MapSabitGider(SabitGider gider, DateTime tarih, bool odendiMi) =>
+            new()
+            {
+                Id = gider.Id,
+                KaynakId = gider.Id,
+                Kod = gider.OdemeKodu ?? "",
+                Aciklama = $"{gider.GiderAdi} ({tarih:MMMM yyyy})",
+                Tarih = tarih,
+                Tutar = gider.Tutar,
+                ParaBirimi = gider.ParaBirimi ?? "TL",
+                KaynakModul = "Sabit Ödeme",
+                OdenmeDurumu = odendiMi,
+                SirketAdi = gider.Company?.Name ?? "",
+                CariFirmaAdi = gider.CariFirma?.Name ?? "",
+                FaturaNo = gider.FaturaNo,
+                OdeyenKullaniciAdi = gider.OdeyenKullaniciAdi,
+                Durum = odendiMi,
+                VadeTarihi = tarih,
+                TaksitNo = 0
+            };
+
+        private static OdemeViewModel MapGenelOdeme(GenelOdeme odeme) => new()
+        {
+            Id = odeme.Id,
+            KaynakId = odeme.Id,
+            Kod = odeme.OdemeKodu ?? "",
+            Aciklama = odeme.Aciklama ?? "",
+            Tarih = odeme.OdemeTarihi ?? DateTime.MinValue,
+            Tutar = odeme.Tutar,
+            ParaBirimi = odeme.ParaBirimi ?? "TL",
+            KaynakModul = "Genel Ödeme",
+            OdenmeDurumu = odeme.IsOdedildiMi,
+            SirketAdi = odeme.Company?.Name ?? "",
+            CariFirmaAdi = odeme.CariFirma?.Name ?? "",
+            FaturaNo = odeme.FaturaNo,
+            OdeyenKullaniciAdi = odeme.OdeyenKullaniciAdi,
+            Durum = odeme.IsOdedildiMi,
+            VadeTarihi = odeme.OdemeTarihi ?? DateTime.MinValue,
+            TaksitNo = 0
+        };
+
+        private static OdemeViewModel MapKrediTaksit(KrediTaksit taksit) => new()
+        {
+            Id = taksit.Id,
+            KaynakId = taksit.Id,
+            Kod = $"{taksit.KrediKodu}-T{taksit.TaksitNo:D2}",
+            Aciklama = $"{taksit.Kredi?.KrediKonusu} (Taksit {taksit.TaksitNo})",
+            Tarih = taksit.Tarih,
+            Tutar = taksit.Tutar,
+            ParaBirimi = taksit.Kredi?.ParaBirimi ?? "TL",
+            KaynakModul = "Kredi",
+            OdenmeDurumu = taksit.OdenmeDurumu,
+            OdemeTarihi = taksit.OdenmeTarihi,
+            OdemeBankasi = taksit.OdemeBankasi,
+            SirketAdi = taksit.Kredi?.SirketAdi ?? "",
+            OdeyenKullaniciAdi = taksit.OdeyenKullaniciAdi,
+            Durum = taksit.OdenmeDurumu,
+            VadeTarihi = taksit.Tarih,
+            TaksitNo = taksit.TaksitNo
+        };
+
+        private static OdemeViewModel MapKrediKartiOdeme(KrediKartiOdeme odeme) => new()
+        {
+            Id = odeme.Id,
+            KaynakId = odeme.Id,
+            Kod = odeme.OdemeKodu ?? "",
+            Aciklama = odeme.Aciklama ?? "",
+            Tarih = odeme.OdemeTarihi ?? DateTime.MinValue,
+            Tutar = odeme.Tutar,
+            ParaBirimi = "TL",
+            KaynakModul = "Kredi Kartı",
+            OdenmeDurumu = odeme.OdenmeDurumu,
+            SirketAdi = odeme.Company?.Name ?? "",        // 🔥 Şirket Adı burası
+            CariFirmaAdi = "",                            // 🔥 Burada cari firma yok zaten kredi kartı ödemelerinde
+            OdeyenKullaniciAdi = odeme.OdeyenKullaniciAdi,
+            Durum = odeme.OdenmeDurumu,
+            VadeTarihi = odeme.OdemeTarihi ?? DateTime.MinValue,
+            TaksitNo = 0
+        };
+
+        private static OdemeViewModel MapCek(Cek cek) => new()
+        {
+            Id = cek.Id,
+            KaynakId = cek.Id,
+            Kod = cek.CekKodu ?? "",
+            Aciklama = $"Çek No: {cek.CekNumarasi}",
+            Tarih = cek.VadeTarihi,
+            Tutar = cek.Tutar,
+            ParaBirimi = cek.ParaBirimi ?? "TL",
+            KaynakModul = "Çek",
+            OdenmeDurumu = cek.OdenmeDurumu,
+            SirketAdi = cek.SirketAdi ?? "",            
+            CariFirmaAdi = cek.CariFirma?.Name ?? "",
+            OdeyenKullaniciAdi = cek.OdeyenKullaniciAdi,
+            Durum = cek.OdenmeDurumu,
+            VadeTarihi = cek.VadeTarihi,
+            TaksitNo = 0
+        };
+
+        private static OdemeViewModel MapDegiskenOdeme(DegiskenOdeme odeme) => new()
+        {
+            Id = odeme.Id,
+            KaynakId = odeme.Id,
+            Kod = odeme.OdemeKodu,
+            Aciklama = $"{odeme.GiderTuru}{(string.IsNullOrWhiteSpace(odeme.Aciklama) ? "" : $" - {odeme.Aciklama}")}",
+            Tarih = odeme.OdemeTarihi,
+            Tutar = odeme.Tutar,
+            ParaBirimi = odeme.ParaBirimi ?? "TL",
+            KaynakModul = "Değişken S. Ödeme",
+            OdenmeDurumu = odeme.OdenmeDurumu,
+            OdemeTarihi = odeme.OdemeTarihi,
+            OdemeBankasi = odeme.OdemeBankasi,
+            SirketAdi = odeme.Company?.Name ?? "",
+            CariFirmaAdi = odeme.CariFirma?.Name ?? "",
+            FaturaNo = odeme.FaturaNo,
+            OdeyenKullaniciAdi = odeme.OdeyenKullaniciAdi,
+            Durum = odeme.OdenmeDurumu,
+            VadeTarihi = odeme.OdemeTarihi,
+            TaksitNo = 0
+        };
+    
+
 
         private void DgOdemeler_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
@@ -437,6 +348,7 @@ namespace OdemeTakip.Desktop
         {
             var db = App.DbContext;
             if (db == null) return;
+
             List<OdemeViewModel> sonrakiTaksitlerListesi = new();
             DateTime simdi = DateTime.Today;
 
@@ -446,33 +358,28 @@ namespace OdemeTakip.Desktop
                               .FirstOrDefault(k => k.Taksitler.Any(t => t.Id == anaOdeme.Id));
                 if (kredi != null)
                 {
-                    // Seçilen taksitten sonrakileri ve ödenmemiş olanları al, veya tüm gelecek taksitleri
                     sonrakiTaksitlerListesi.AddRange(
                         kredi.Taksitler
-                            .Where(t => t.Tarih > anaOdeme.Tarih) // Seçilenden sonraki taksitler
+                            .Where(t => t.Tarih > anaOdeme.Tarih)
                             .OrderBy(t => t.Tarih)
-                            .Take(12) // Örneğin sonraki 12 taksiti göster
+                            .Take(12)
                             .Select(t => new OdemeViewModel
                             {
                                 Aciklama = $"Taksit {t.TaksitNo}",
                                 Tarih = t.Tarih,
                                 Tutar = t.Tutar,
                                 OdenmeDurumu = t.OdenmeDurumu
-                            })
-                    );
+                            }));
                 }
             }
             else if (anaOdeme.KaynakModul == "Sabit Ödeme")
             {
-                var giderSablonu = db.SabitGiderler.AsNoTracking().FirstOrDefault(sg => sg.Id == anaOdeme.KaynakId); // KaynakId ana şablonun Id'si olmalı
+                var giderSablonu = db.SabitGiderler.AsNoTracking().FirstOrDefault(sg => sg.Id == anaOdeme.KaynakId);
                 if (giderSablonu != null && giderSablonu.OtomatikMi)
                 {
-                    DateTime iterTarih = anaOdeme.Tarih; // Seçilen ödemenin tarihinden başla
-                    if (string.IsNullOrWhiteSpace(giderSablonu.Periyot)) return;
-
-                    for (int i = 0; i < 12; i++) // Örneğin sonraki 12 dönemi göster
+                    DateTime iterTarih = anaOdeme.Tarih;
+                    for (int i = 0; i < 12; i++)
                     {
-                        // Bir sonraki dönemin tarihini hesapla
                         iterTarih = giderSablonu.Periyot switch
                         {
                             "Aylık" => iterTarih.AddMonths(1),
@@ -483,12 +390,13 @@ namespace OdemeTakip.Desktop
                         if (iterTarih == DateTime.MaxValue) break;
 
                         var instancePayment = db.SabitGiderler.AsNoTracking()
-                            .FirstOrDefault(sg => sg.OdemeKodu == giderSablonu.OdemeKodu && sg.BaslangicTarihi == iterTarih && sg.OtomatikMi == true);
+                            .FirstOrDefault(sg => sg.OdemeKodu == giderSablonu.OdemeKodu &&
+                                                  sg.BaslangicTarihi == iterTarih && sg.OtomatikMi);
                         bool buPeriyotOdendi = instancePayment != null && instancePayment.OdendiMi;
 
                         sonrakiTaksitlerListesi.Add(new OdemeViewModel
                         {
-                            Aciklama = $"{giderSablonu.GiderAdi} ({iterTarih:MMMM Gatsby})",
+                            Aciklama = $"{giderSablonu.GiderAdi} ({iterTarih:MMMM yyyy})",
                             Tarih = iterTarih,
                             Tutar = giderSablonu.Tutar,
                             OdenmeDurumu = buPeriyotOdendi
@@ -496,8 +404,10 @@ namespace OdemeTakip.Desktop
                     }
                 }
             }
+
             DgSonrakiTaksitler.ItemsSource = sonrakiTaksitlerListesi;
         }
+
 
 
         // BtnOdenme_Click, GeriAlOdemeDurumu, IsaretleOdendi, UpdatePaymentStatus, BulEntity metotları

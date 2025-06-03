@@ -37,7 +37,8 @@
                 <DataGridTextColumn Header="Kod" Binding="{Binding Kod}" Width="100"/>
                 <DataGridTextColumn Header="Tip" Binding="{Binding KaynakModul}" Width="150"/>
                 <DataGridTextColumn Header="Açıklama" Binding="{Binding Aciklama}" Width="*"/>
-                <DataGridTextColumn Header="Cari" Binding="{Binding SirketAdi}" Width="*"/>
+                <DataGridTextColumn Header="Şirket" Binding="{Binding SirketAdi}" Width="*" />
+                <DataGridTextColumn Header="Cari Firma" Binding="{Binding CariFirmaAdi}" Width="*" />
                 <DataGridTextColumn Header="Vade Tarihi" Binding="{Binding Tarih, StringFormat=dd.MM.yyyy}" Width="120"/>
                 <DataGridTextColumn Header="Tutar" Binding="{Binding Tutar, StringFormat=N2}" Width="100"/>
                 <DataGridTextColumn Header="P.B." Binding="{Binding ParaBirimi}" Width="70"/>

@@ -84,16 +84,33 @@ namespace OdemeTakip.Desktop
 
             if (cmbCariFirma.SelectedValue is int cariFirmaId)  // 🔥 Cari Firma Kaydı
                 _sablon.CariFirmaId = cariFirmaId;
+            else
+                _sablon.CariFirmaId = null;  // Seçilmezse null'a çekiyoruz
 
             if (_isEdit)
+            {
+                // 🔥🔥 Eğer şablon güncelleniyorsa, geçmiş ödemeleri de güncelleyelim:
+                var eskiOdemeler = _db.DegiskenOdemeler
+                    .Where(x => x.GiderTuru == _sablon.GiderTuru && x.CompanyId == _sablon.CompanyId)
+                    .ToList();
+
+                foreach (var odeme in eskiOdemeler)
+                {
+                    odeme.CariFirmaId = _sablon.CariFirmaId;
+                }
+
                 _db.DegiskenOdemeSablonlari.Update(_sablon);
+            }
             else
+            {
                 _db.DegiskenOdemeSablonlari.Add(_sablon);
+            }
 
             _db.SaveChanges();
             DialogResult = true;
             Close();
         }
+
 
         private void BtnIptal_Click(object sender, RoutedEventArgs e)
         {

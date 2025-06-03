@@ -19,7 +19,8 @@
                 <DataGridTextColumn Header="No " Binding="{Binding CekNumarasi}" Width="*" />
 
                 <!-- 🔥 Firma yerine Cari Firma Adı -->
-                <DataGridTextColumn Header="Cari" Binding="{Binding CariFirmaAdi}" Width="*" />
+                <DataGridTextColumn Header="Cari" Binding="{Binding CariFirma.Name}" Width="*" />
+
 
                 <DataGridTextColumn Header="Tür" Binding="{Binding CekTuru}" Width="*" />
                 <DataGridTextColumn Header="Banka" Binding="{Binding Banka}" Width="*" />

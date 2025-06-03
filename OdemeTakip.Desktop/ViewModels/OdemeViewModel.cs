@@ -24,6 +24,13 @@ namespace OdemeTakip.Desktop.ViewModels
         public string? OdeyenKullaniciAdi { get; set; } = ""; // Ödeme yapan kullanıcının adı
         public int Id { get; set; } // Entity'nin asıl Primary Key'i için
         public int KaynakId { get; set; } // Hangi entity'den geldiğini belirtmek için (genellikle Id ile aynı olabilir)
+        public bool Durum { get; set; } // Ödeme yapıldı mı?
+        public DateTime VadeTarihi { get; set; } // Taksit veya Ödeme Vade Tarihi
+        public int TaksitNo { get; set; } // Ödeme taksit numarası
+        public string CariFirmaAdi { get; set; } = "";
+
+
+
     }
 
 }

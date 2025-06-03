@@ -63,8 +63,10 @@ namespace OdemeTakip.Desktop
         {
             _kart.CardName = txtCardName.Text.Trim();
             _kart.OwnerType = txtOwnerType.Text.Trim();
+
             if (cmbOwnerCompany.SelectedValue is int companyId)
                 _kart.CompanyId = companyId;
+
             _kart.Banka = cmbBanka.Text.Trim();
             _kart.CardNumberLast4 = txtCardNumberLast4.Text.Trim();
             _kart.Notes = txtNotes.Text.Trim();
@@ -80,13 +82,27 @@ namespace OdemeTakip.Desktop
                 _kart.PaymentDueDate = dpPaymentDueDate.SelectedDate.Value;
 
             if (_isEdit)
+            {
                 _db.KrediKartlari.Update(_kart);
+
+                // 🚀 Buraya EKLE
+                var eskiOdemeler = _db.KrediKartiOdemeleri.Where(x => x.KartAdi == _kart.CardName).ToList();
+                foreach (var odeme in eskiOdemeler)
+                {
+                    odeme.CompanyId = _kart.CompanyId;
+                }
+                _db.KrediKartiOdemeleri.UpdateRange(eskiOdemeler);
+            }
             else
+            {
                 _db.KrediKartlari.Add(_kart);
+            }
 
             _db.SaveChanges();
             DialogResult = true;
             Close();
         }
+
     }
 }
+
