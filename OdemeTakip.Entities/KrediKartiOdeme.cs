@@ -12,15 +12,15 @@ namespace OdemeTakip.Entities
         public int Id { get; set; }
         public string? OdemeKodu { get; set; }
         public string? OdemeBankasi { get; set; }
-        public string? OwnerName { get; set; }
+
+        public int? CompanyId { get; set; }  // 🔥 Şirket FK
+        public Company? Company { get; set; }  // 🔥 Şirket Navigation
 
         public string? KartAdi { get; set; }
-
         public string? Aciklama { get; set; }
 
         [Column(TypeName = "decimal(18,2)")]
         public decimal Tutar { get; set; }
-
         public DateTime? OdemeTarihi { get; set; }
 
         public string? Banka { get; set; }

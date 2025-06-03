@@ -8,19 +8,18 @@
 
     <Grid Margin="10">
         <StackPanel>
-            <!-- 🔼 Butonlar üstte ve sağda hizalı -->
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,0,0,10">
                 <Button Content="➕ Ekle" Width="80" Margin="5" Click="BtnEkle_Click"/>
                 <Button Content="✏️ Güncelle" Width="90" Margin="5" Click="BtnGuncelle_Click"/>
                 <Button Content="🗑️ Sil" Width="80" Margin="5" Click="BtnSil_Click"/>
             </StackPanel>
 
-            <!-- 🧾 DataGrid -->
             <DataGrid x:Name="dgKrediKartlari" AutoGenerateColumns="False" CanUserAddRows="False">
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="Kart Adı" Binding="{Binding CardName}" Width="*" />
                     <DataGridTextColumn Header="Sahip Türü" Binding="{Binding OwnerType}" Width="*" />
-                    <DataGridTextColumn Header="Sahibi" Binding="{Binding OwnerName}" Width="*" />
+                    <DataGridTextColumn Header="Şirket Adı" Binding="{Binding Company.Name}" Width="*" />
+                    <!-- 🔥 Düzeltildi -->
                     <DataGridTextColumn Header="Banka" Binding="{Binding Banka}" Width="*" />
                     <DataGridTextColumn Header="Son 4 Hane" Binding="{Binding CardNumberLast4}" Width="*" />
                     <DataGridTextColumn Header="Limit" Binding="{Binding Limit}" Width="*" />

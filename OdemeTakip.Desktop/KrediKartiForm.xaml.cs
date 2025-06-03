@@ -10,6 +10,7 @@ namespace OdemeTakip.Desktop
         private readonly AppDbContext _db;
         private readonly KrediKarti _kart;
         private readonly bool _isEdit;
+        
 
         public KrediKartiForm(AppDbContext db, KrediKarti? kart = null)
         {
@@ -18,13 +19,16 @@ namespace OdemeTakip.Desktop
             _db = db;
             _kart = kart ?? new KrediKarti();
             _isEdit = kart != null;
+            LoadCompanies();
+
+           
             BankalariYukle();
 
             if (_isEdit)
             {
                 txtCardName.Text = _kart.CardName;
                 txtOwnerType.Text = _kart.OwnerType;
-                txtOwnerName.Text = _kart.OwnerName;
+                cmbOwnerCompany.SelectedValue = _kart.CompanyId;  // 🔥 Seçili Company I
                 txtCardNumberLast4.Text = _kart.CardNumberLast4;
                 txtLimit.Text = _kart.Limit.ToString();
                 dpDueDate.SelectedDate = _kart.DueDate;
@@ -33,6 +37,18 @@ namespace OdemeTakip.Desktop
                 cmbBanka.Text = _kart.Banka;
             }
         }
+        private void LoadCompanies()
+        {
+            cmbOwnerCompany.ItemsSource = _db.Companies
+                .Where(c => c.IsActive)
+                .OrderBy(c => c.Name)
+                .ToList();
+
+            cmbOwnerCompany.DisplayMemberPath = "Name";     // Şirket ismini göster
+            cmbOwnerCompany.SelectedValuePath = "Id";       // Şirket Id'si kaydolacak
+        }
+
+
         private void BankalariYukle()
         {
             cmbBanka.ItemsSource = _db.Bankalar
@@ -47,7 +63,8 @@ namespace OdemeTakip.Desktop
         {
             _kart.CardName = txtCardName.Text.Trim();
             _kart.OwnerType = txtOwnerType.Text.Trim();
-            _kart.OwnerName = txtOwnerName.Text.Trim();
+            if (cmbOwnerCompany.SelectedValue is int companyId)
+                _kart.CompanyId = companyId;
             _kart.Banka = cmbBanka.Text.Trim();
             _kart.CardNumberLast4 = txtCardNumberLast4.Text.Trim();
             _kart.Notes = txtNotes.Text.Trim();

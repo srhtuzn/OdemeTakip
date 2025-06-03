@@ -24,6 +24,8 @@
                 <DataGridTextColumn Header="Para Birimi" Binding="{Binding ParaBirimi}" Width="*" />
                 <DataGridTextColumn Header="Tarih" Binding="{Binding OdemeTarihi, StringFormat=\{0:dd.MM.yyyy\}}" Width="*" />
                 <DataGridTextColumn Header="Şirket" Binding="{Binding Company.Name}" Width="*" />
+                <DataGridTextColumn Header="Cari" Binding="{Binding CariFirma.Name}" Width="*"/>
+
             </DataGrid.Columns>
         </DataGrid>
 

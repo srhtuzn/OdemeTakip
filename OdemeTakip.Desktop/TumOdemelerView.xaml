@@ -1,0 +1,67 @@
+﻿<UserControl x:Class="OdemeTakip.Desktop.TumOdemelerView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Loaded="UserControl_Loaded">
+
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <!-- Arama Alanı -->
+            <RowDefinition Height="*"/>
+            <!-- Ödemeler Listesi -->
+            <RowDefinition Height="Auto"/>
+            <!-- Expander Alanı -->
+        </Grid.RowDefinitions>
+
+        <StackPanel Orientation="Horizontal" Margin="0,0,0,10" Grid.Row="0">
+            <TextBox x:Name="TxtArama" Width="250" 
+                     TextChanged="TxtArama_TextChanged" Margin="0,0,10,0"
+                     ToolTip="🔍 Ara (Kod, Açıklama, Cari)"/>
+            <ComboBox x:Name="CmbOdemeDurumu" Width="200" SelectionChanged="CmbOdemeDurumu_SelectionChanged" Margin="0,0,10,0">
+                <ComboBoxItem Content="Ödenecekler"/>
+                <ComboBoxItem Content="Ödenmişler"/>
+                <ComboBoxItem Content="Tümü"/>
+            </ComboBox>
+            <Button x:Name="BtnFiltreleYenile" Content="🔄 Yenile / Filtrele" Click="BtnFiltreleYenile_Click" />
+        </StackPanel>
+
+        <DataGrid x:Name="DgOdemeler"
+                  Grid.Row="1"
+                  AutoGenerateColumns="False"
+                  IsReadOnly="True"
+                  CanUserAddRows="False"
+                  AlternatingRowBackground="#f9f9f9"
+                  SelectionMode="Single"
+                  MouseDoubleClick="DgOdemeler_MouseDoubleClick">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Kod" Binding="{Binding Kod}" Width="100"/>
+                <DataGridTextColumn Header="Tip" Binding="{Binding KaynakModul}" Width="150"/>
+                <DataGridTextColumn Header="Açıklama" Binding="{Binding Aciklama}" Width="*"/>
+                <DataGridTextColumn Header="Cari" Binding="{Binding SirketAdi}" Width="*"/>
+                <DataGridTextColumn Header="Vade Tarihi" Binding="{Binding Tarih, StringFormat=dd.MM.yyyy}" Width="120"/>
+                <DataGridTextColumn Header="Tutar" Binding="{Binding Tutar, StringFormat=N2}" Width="100"/>
+                <DataGridTextColumn Header="P.B." Binding="{Binding ParaBirimi}" Width="70"/>
+                <DataGridTextColumn Header="Ö.Tarihi" Binding="{Binding OdemeTarihi, StringFormat=dd.MM.yyyy}" Width="100"/>
+                <DataGridTextColumn Header="Ö.Banka" Binding="{Binding OdemeBankasi}" Width="120"/>
+                <DataGridTextColumn Header="Ödeyen" Binding="{Binding OdeyenKullaniciAdi}" Width="120"/>
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <!-- Sonraki Taksitler Expander -->
+        <Expander x:Name="ExpanderSonrakiTaksitler" Header="📅 Sonraki Taksitler" Grid.Row="2" Visibility="Collapsed" IsExpanded="False" Margin="0,10,0,0">
+            <DataGrid x:Name="DgSonrakiTaksitler"
+                      AutoGenerateColumns="False"
+                      IsReadOnly="True"
+                      CanUserAddRows="False"
+                      AlternatingRowBackground="#f9f9f9"
+                      SelectionMode="Single">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Taksit No" Binding="{Binding TaksitNo}" Width="100"/>
+                    <DataGridTextColumn Header="Vade Tarihi" Binding="{Binding VadeTarihi, StringFormat=dd.MM.yyyy}" Width="150"/>
+                    <DataGridTextColumn Header="Tutar" Binding="{Binding Tutar, StringFormat=N2}" Width="150"/>
+                    <DataGridTextColumn Header="Durum" Binding="{Binding Durum}" Width="100"/>
+                </DataGrid.Columns>
+            </DataGrid>
+        </Expander>
+    </Grid>
+</UserControl>

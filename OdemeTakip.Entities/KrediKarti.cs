@@ -11,24 +11,21 @@ namespace OdemeTakip.Entities
     {
         public int Id { get; set; }
         public string? CardName { get; set; }
-
         public string? OwnerType { get; set; }
 
-        public string? OwnerName { get; set; }
+        public int? CompanyId { get; set; }  // 🔥 FK: Şirketi Seçeceğiz
+        public Company? Company { get; set; }  // 🔥 Navigation Property
 
         public string Banka { get; set; } = string.Empty;
-
         public string? CardNumberLast4 { get; set; }
 
         [Column(TypeName = "decimal(18,2)")]
         public decimal Limit { get; set; }
 
         public DateTime DueDate { get; set; }
-
         public DateTime PaymentDueDate { get; set; }
-
         public string? Notes { get; set; }
-
         public bool IsActive { get; set; } = true;
     }
+
 }

@@ -22,6 +22,7 @@ namespace OdemeTakip.Desktop
             _isEdit = sablon != null;
 
             SirketleriYukle();
+            CariFirmalariYukle();  // 🔥 Cari firmaları da yükle
             cmbParaBirimi.SelectedIndex = 0;
 
             if (_isEdit)
@@ -31,6 +32,7 @@ namespace OdemeTakip.Desktop
                 cmbParaBirimi.Text = _sablon.ParaBirimi;
                 txtGun.Text = _sablon.Gun.ToString();
                 cmbSirket.SelectedValue = _sablon.CompanyId;
+                cmbCariFirma.SelectedValue = _sablon.CariFirmaId;  // 🔥 Cari Firma Seçimi
             }
         }
 
@@ -42,6 +44,17 @@ namespace OdemeTakip.Desktop
 
             cmbSirket.DisplayMemberPath = "Name";
             cmbSirket.SelectedValuePath = "Id";
+        }
+
+        private void CariFirmalariYukle()
+        {
+            cmbCariFirma.ItemsSource = _db.CariFirmalar
+                .Where(x => x.IsActive)
+                .OrderBy(x => x.Name)
+                .ToList();
+
+            cmbCariFirma.DisplayMemberPath = "Name";
+            cmbCariFirma.SelectedValuePath = "Id";
         }
 
         private void BtnKaydet_Click(object sender, RoutedEventArgs e)
@@ -68,6 +81,9 @@ namespace OdemeTakip.Desktop
 
             if (cmbSirket.SelectedValue is int companyId)
                 _sablon.CompanyId = companyId;
+
+            if (cmbCariFirma.SelectedValue is int cariFirmaId)  // 🔥 Cari Firma Kaydı
+                _sablon.CariFirmaId = cariFirmaId;
 
             if (_isEdit)
                 _db.DegiskenOdemeSablonlari.Update(_sablon);

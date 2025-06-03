@@ -11,8 +11,11 @@
             <TextBlock Text="Sahip Türü (Şirket / Şahıs):"/>
             <TextBox x:Name="txtOwnerType" Margin="0 0 0 10"/>
 
-            <TextBlock Text="Sahip Adı:"/>
-            <TextBox x:Name="txtOwnerName" Margin="0 0 0 10"/>
+            <TextBlock Text="Şirket Adı:"/>
+            <!-- 🔥 Labelı değiştirdim -->
+            <ComboBox x:Name="cmbOwnerCompany" Margin="0 0 0 10"
+                      DisplayMemberPath="Name" 
+                      SelectedValuePath="Id"/>
 
             <TextBlock Text="Banka:"/>
             <ComboBox x:Name="cmbBanka" IsEditable="False" Margin="0 0 0 10"/>

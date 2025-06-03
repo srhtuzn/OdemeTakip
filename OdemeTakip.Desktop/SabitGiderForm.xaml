@@ -40,6 +40,9 @@
                   DisplayMemberPath="Name"
                   SelectedValuePath="Id"
                   IsEditable="False" />
+        <Label Content="Cari Firma:" />
+        <ComboBox x:Name="cmbCariFirma" />
+
 
         <Button Content="Kaydet" Margin="0,20,0,0" Click="BtnKaydet_Click"/>
     </StackPanel>

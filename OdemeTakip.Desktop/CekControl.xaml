@@ -15,17 +15,19 @@
 
         <DataGrid x:Name="dgCekler" AutoGenerateColumns="False" Grid.Row="1" Margin="0 0 0 10">
             <DataGrid.Columns>
-                <DataGridTextColumn Header="Çek Kodu" Binding="{Binding CekKodu}" Width="100"/>
+                <DataGridTextColumn Header="Çek Kodu" Binding="{Binding CekKodu}" Width="100" />
+                <DataGridTextColumn Header="No " Binding="{Binding CekNumarasi}" Width="*" />
 
-                <DataGridTextColumn Header="No (Belgedeki)" Binding="{Binding CekNumarasi}" Width="*" />
-                <DataGridTextColumn Header="Firma" Binding="{Binding FirmaAdi}" Width="*" />
+                <!-- 🔥 Firma yerine Cari Firma Adı -->
+                <DataGridTextColumn Header="Cari" Binding="{Binding CariFirmaAdi}" Width="*" />
+
                 <DataGridTextColumn Header="Tür" Binding="{Binding CekTuru}" Width="*" />
                 <DataGridTextColumn Header="Banka" Binding="{Binding Banka}" Width="*" />
                 <DataGridTextColumn Header="Tutar" Binding="{Binding Tutar}" Width="*" />
                 <DataGridTextColumn Header="Para Birimi" Binding="{Binding ParaBirimi}" Width="*" />
                 <DataGridTextColumn Header="Vade" Binding="{Binding VadeTarihi, StringFormat=\{0:dd.MM.yyyy\}}" Width="*" />
                 <DataGridTextColumn Header="Tahsil Tarihi" Binding="{Binding TahsilTarihi, StringFormat=\{0:dd.MM.yyyy\}}" Width="*" />
-                <DataGridCheckBoxColumn Header="Tahsil Edildi" Binding="{Binding TahsilEdildiMi}" Width="*" />
+
             </DataGrid.Columns>
         </DataGrid>
 

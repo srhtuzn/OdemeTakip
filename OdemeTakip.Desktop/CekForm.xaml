@@ -11,11 +11,11 @@
             <TextBlock Text="Şirket" Margin="0,10,0,0"/>
             <ComboBox x:Name="cmbSirket"/>
 
-            <TextBlock Text="Firma (Karşı Taraf)" Margin="0,10,0,0"/>
-            <ComboBox x:Name="cmbCariFirma"/>
+            <Label Content="Cari " />
+            <ComboBox x:Name="cmbCariFirma" />
 
 
-            <TextBlock Text="Çek Türü (Alınan / Verilen):"/>
+            <TextBlock Text="Çek Türü "/>
             <ComboBox x:Name="cmbTur" Margin="0 0 0 10">
                 <ComboBoxItem Content="Alınan"/>
                 <ComboBoxItem Content="Verilen"/>

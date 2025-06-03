@@ -17,7 +17,6 @@ namespace OdemeTakip.Desktop
 
             _db = App.DbContext;
 
-
             LoadKrediKartlari();
         }
 
@@ -28,7 +27,11 @@ namespace OdemeTakip.Desktop
 
         private void LoadKrediKartlari()
         {
-            var list = _db.KrediKartlari.ToList();
+            var list = _db.KrediKartlari
+                .Include(k => k.Company) // 🔥 FK Şirket bilgisini de çekiyoruz
+                .Where(k => k.IsActive)
+                .ToList();
+
             dgKrediKartlari.ItemsSource = list;
         }
 

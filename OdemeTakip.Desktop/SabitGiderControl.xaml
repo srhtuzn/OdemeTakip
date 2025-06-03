@@ -25,6 +25,8 @@
                 <DataGridTextColumn Header="Başlangıç Tarihi" Binding="{Binding BaslangicTarihi, StringFormat=\{0:dd.MM.yyyy\}}" Width="*" />
                 <DataGridTextColumn Header="Periyot" Binding="{Binding Periyot}" Width="*" />
                 <DataGridTextColumn Header="Şirket" Binding="{Binding Company.Name}" Width="*" />
+                <DataGridTextColumn Header="Cari Firma" Binding="{Binding CariFirma.Name}" Width="*" />
+
             </DataGrid.Columns>
         </DataGrid>
 

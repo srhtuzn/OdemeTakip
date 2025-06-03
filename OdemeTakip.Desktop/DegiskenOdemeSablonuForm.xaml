@@ -15,6 +15,9 @@
 
             <TextBlock Text="Şirket:" Margin="0,10,0,0"/>
             <ComboBox x:Name="cmbSirket" DisplayMemberPath="Name" SelectedValuePath="Id"/>
+            <Label Content="Cari Firma:" />
+            <ComboBox x:Name="cmbCariFirma" />
+
 
             <TextBlock Text="Para Birimi:" Margin="0,10,0,0"/>
             <ComboBox x:Name="cmbParaBirimi">

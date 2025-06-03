@@ -141,8 +141,8 @@ namespace OdemeTakip.Desktop
         {
             if (e.Source is TabControl tabControl && tabControl.Name == "MainTabControl")
             {
-                if (tabDetayliOdeme.IsSelected && detayliOdemeListesiControl != null)
-                    detayliOdemeListesiControl.YenidenYukle();
+                if (tabTumOdemeler.IsSelected && tumOdemelerViewControl != null)
+                    tumOdemelerViewControl.FiltreleVeYukle();
 
                 if (genelOdemeControl != null && genelOdemeControl.IsVisible)
                     genelOdemeControl.YenidenYukle();

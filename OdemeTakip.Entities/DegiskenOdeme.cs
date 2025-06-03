@@ -32,6 +32,8 @@ namespace OdemeTakip.Entities
         public int? CompanyId { get; set; }
         public Company? Company { get; set; }
         public string? OdeyenKullaniciAdi { get; set; }
+        public int? CariFirmaId { get; set; }   // Yeni ekleyeceğimiz alan
+        public virtual CariFirma CariFirma { get; set; } // Navigation Property
     }
 
 }

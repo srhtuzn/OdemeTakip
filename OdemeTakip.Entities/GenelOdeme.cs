@@ -24,5 +24,7 @@ namespace OdemeTakip.Entities
         public bool IsActive { get; set; } = true;
         public string? OdeyenKullaniciAdi { get; set; }
         public string? FaturaNo { get; set; } // Opsiyonel fatura no (fatura aramalarına uygun)
+        public int? CariFirmaId { get; set; }   // Yeni ekleyeceğimiz alan
+        public virtual CariFirma CariFirma { get; set; } // Navigation Property
     }
 }

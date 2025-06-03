@@ -21,11 +21,26 @@ namespace OdemeTakip.Desktop
         {
             var db = App.DbContext;
 
-            var sabit = db.SabitGiderler.Where(x => x.IsActive).ToList();
-            var genel = db.GenelOdemeler.Where(x => x.IsActive).ToList();
-            var kart = db.KrediKartiOdemeleri.Where(x => x.IsActive).ToList();
-            var kredi = db.Krediler.Where(x => x.IsActive).ToList();
-            var cek = db.Cekler.Where(x => x.IsActive).ToList();
+            var sabit = db.SabitGiderler
+                .Where(x => x.IsActive)
+                .ToList();
+
+            var genel = db.GenelOdemeler
+                .Where(x => x.IsActive)
+                .ToList();
+
+            var kart = db.KrediKartiOdemeleri
+                .Include(x => x.Company) // 🔥 FK ile Şirket bilgisi
+                .Where(x => x.IsActive)
+                .ToList();
+
+            var kredi = db.Krediler
+                .Where(x => x.IsActive)
+                .ToList();
+
+            var cek = db.Cekler
+                .Where(x => x.IsActive)
+                .ToList();
 
             var sirketGruplari = new Dictionary<string, decimal>();
 
@@ -36,7 +51,7 @@ namespace OdemeTakip.Desktop
                 Ekle(item.Company?.Name, item.Tutar);
 
             foreach (var item in kart)
-                Ekle(item.OwnerName, item.Tutar);
+                Ekle(item.Company?.Name, item.Tutar);  // 🔥 OwnerName değil, Company.Name
 
             foreach (var item in kredi)
                 Ekle(item.SirketAdi, item.AylikTaksitTutari);
@@ -74,4 +89,4 @@ namespace OdemeTakip.Desktop
             }
         }
     }
-}
+    }

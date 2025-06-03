@@ -16,6 +16,8 @@
                     <DataGridTextColumn Header="Şirket" Binding="{Binding Company.Name}" Width="*"/>
                     <DataGridTextColumn Header="Gün" Binding="{Binding Gun}" Width="80"/>
                     <DataGridTextColumn Header="Para Birimi" Binding="{Binding ParaBirimi}" Width="100"/>
+                    <DataGridTextColumn Header="Cari Firma" Binding="{Binding CariFirma.Name}" Width="*" />
+
                 </DataGrid.Columns>
             </DataGrid>
         </StackPanel>

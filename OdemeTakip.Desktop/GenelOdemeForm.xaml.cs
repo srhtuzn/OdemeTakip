@@ -22,6 +22,7 @@ namespace OdemeTakip.Desktop
             _isEdit = odeme != null;
 
             SirketleriYukle();
+            CariFirmalariYukle(); // 🔥 Cari Firmalar
 
             if (_isEdit)
             {
@@ -30,9 +31,9 @@ namespace OdemeTakip.Desktop
                 txtAciklama.Text = _odeme.Aciklama;
                 txtTutar.Text = _odeme.Tutar.ToString("N2");
                 dpTarih.SelectedDate = _odeme.OdemeTarihi;
-                chkOdedildi.IsChecked = _odeme.IsOdedildiMi;
 
                 cmbSirketAdi.SelectedValue = _odeme.CompanyId;
+                cmbCariFirma.SelectedValue = _odeme.CariFirmaId; // 🔥 Cari Firma Seçim
 
                 foreach (ComboBoxItem item in cmbParaBirimi.Items)
                 {
@@ -49,7 +50,19 @@ namespace OdemeTakip.Desktop
         {
             cmbSirketAdi.ItemsSource = _db.Companies
                 .Where(c => c.IsActive)
-                .ToList(); // Şirket listesi direkt nesne olarak bağlandı
+                .ToList();
+            cmbSirketAdi.DisplayMemberPath = "Name";
+            cmbSirketAdi.SelectedValuePath = "Id";
+        }
+
+        private void CariFirmalariYukle()
+        {
+            cmbCariFirma.ItemsSource = _db.CariFirmalar
+                .Where(c => c.IsActive)
+                .OrderBy(c => c.Name)
+                .ToList();
+            cmbCariFirma.DisplayMemberPath = "Name";
+            cmbCariFirma.SelectedValuePath = "Id";
         }
 
         private string GenelOdemeKoduUret()
@@ -63,10 +76,12 @@ namespace OdemeTakip.Desktop
             _odeme.FaturaNo = txtFaturaNo.Text.Trim();
             _odeme.OdemeAdi = txtOdemeAdi.Text.Trim();
             _odeme.Aciklama = txtAciklama.Text.Trim();
-            _odeme.IsOdedildiMi = chkOdedildi.IsChecked == true;
 
             if (cmbSirketAdi.SelectedValue is int selectedId)
                 _odeme.CompanyId = selectedId;
+
+            if (cmbCariFirma.SelectedValue is int cariFirmaId) // 🔥 Cari Firma Kaydet
+                _odeme.CariFirmaId = cariFirmaId;
 
             if (decimal.TryParse(txtTutar.Text, out var tutar))
                 _odeme.Tutar = tutar;

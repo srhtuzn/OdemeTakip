@@ -2,102 +2,77 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:local="clr-namespace:OdemeTakip.Desktop"
-        xmlns:viewmodels="clr-namespace:OdemeTakip.Desktop.ViewModels" Title="HAN Ödeme Takip Sistemi"
-        Height="650" Width="1000" MinHeight="500" MinWidth="800" Icon="/loginlogo.jpeg">
-
+        Title="HAN Ödeme Takip Sistemi"
+        Height="650" Width="1000"
+        MinHeight="500" MinWidth="800"
+        WindowStartupLocation="CenterScreen"
+        Icon="loginlogo.jpeg">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <Border Grid.Row="0" BorderBrush="LightGray" BorderThickness="0,0,0,1" Padding="5,8">
-            <DockPanel LastChildFill="False">
+        <!-- Üst Menü -->
+        <StackPanel Grid.Row="0" Orientation="Horizontal" Background="Gray" Margin="10">
+            <TextBlock Text="👤 Hoş Geldiniz," Foreground="White" FontWeight="Bold" Margin="0,0,10,0"/>
+            <TextBlock x:Name="LoggedInUserFullNameTextBlock" Foreground="White" Margin="0,0,5,0"/>
+            <TextBlock Text="(" Foreground="White"/>
+            <TextBlock x:Name="LoggedInUserRoleTextBlock" Foreground="White" FontStyle="Italic"/>
+            <TextBlock Text=")" Foreground="White" Margin="0,0,5,0"/>
 
-                <Button x:Name="LogoutButton" 
-                        Content="🚪 Oturumu Kapat" 
-                        Click="LogoutButton_Click" 
-                        Padding="10,5" MinWidth="130" FontWeight="Medium"
-                        DockPanel.Dock="Right" Background="#FFE0E0E0"/>
+            <Button x:Name="LogoutButton" Content="🚪 Oturumu Kapat"
+                    HorizontalAlignment="Right" Margin="20,0,0,0" Width="150"
+                    Click="LogoutButton_Click"/>
+        </StackPanel>
 
-                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" DockPanel.Dock="Left" Margin="10,0,0,0">
-                    <TextBlock Text="Hoş geldiniz," VerticalAlignment="Center" Margin="0,0,5,0" Foreground="DimGray"/>
-                    <TextBlock x:Name="LoggedInUserFullNameTextBlock" FontWeight="Bold" VerticalAlignment="Center" Text="Kullanıcı"/>
-                    <TextBlock Text=" (" VerticalAlignment="Center" Margin="5,0,0,0" Foreground="DimGray"/>
-                    <TextBlock x:Name="LoggedInUserRoleTextBlock" FontStyle="Italic" VerticalAlignment="Center" Text="Rol"/>
-                    <TextBlock Text=")" VerticalAlignment="Center" Margin="0,0,5,0" Foreground="DimGray"/>
-                </StackPanel>
-            </DockPanel>
-        </Border>
-
-        <TabControl Grid.Row="1" x:Name="MainTabControl" SelectionChanged="TabControl_SelectionChanged">
-            <TabItem Header="📊 Finansal Özet" x:Name="tabDashboard">
-                <local:DashboardControl x:Name="dashboardControl" />
+        <!-- Ana TabControl -->
+        <TabControl x:Name="MainTabControl" Grid.Row="1" Margin="10">
+            <TabItem x:Name="tabTumOdemeler" Header="📋 Tüm Ödeme Kayıtları">
+                <local:TumOdemelerView x:Name="tumOdemelerViewControl"/>
             </TabItem>
-
-            <TabItem Header="Tüm Ödemeler" x:Name="tabDetayliOdeme">
-                <ScrollViewer VerticalScrollBarVisibility="Auto">
-                    <StackPanel Orientation="Vertical">
-                        <GroupBox Header="Aktif Ödemeler" Margin="5">
-                            <local:DetayliOdemeListesiControl x:Name="detayliOdemeListesiControl" />
-                        </GroupBox>
-                        <GroupBox Header="Geçmiş Ödemeler" Margin="5" >
-                            <local:GecmisOdemelerControl x:Name="gecmisOdemelerControl" />
-                        </GroupBox>
-                    </StackPanel>
-                </ScrollViewer>
+            <TabItem x:Name="tabDashboard" Header="📊 Finansal Özet">
+                <local:DashboardControl x:Name="dashboardControl"/>
             </TabItem>
-
             <TabItem Header="🏢 Şirket &amp; Cariler">
                 <ScrollViewer VerticalScrollBarVisibility="Auto">
                     <StackPanel Margin="10">
-                        <TextBlock Text="Şirket Listesi" FontSize="20" FontWeight="Bold" Margin="0 0 0 10" />
-                        <local:SirketYonetimiControl x:Name="sirketControl" />
-                        <Separator Margin="0 20 0 20" />
-                        <TextBlock Text="Cari Firma Listesi" FontSize="20" FontWeight="Bold" Margin="0 0 0 10" />
-                        <local:CariYonetimiControl x:Name="cariControl" />
+                        <local:SirketYonetimiControl />
+                        <Separator Margin="0,20,0,20"/>
+                        <local:CariYonetimiControl />
                     </StackPanel>
                 </ScrollViewer>
             </TabItem>
-
             <TabItem Header="💰 Krediler &amp; Çekler">
                 <ScrollViewer VerticalScrollBarVisibility="Auto">
                     <StackPanel Margin="10">
-                        <TextBlock Text="Kredi Listesi" FontSize="20" FontWeight="Bold" Margin="0 0 0 10" />
-                        <local:KrediControl x:Name="krediControl" />
-                        <Separator Margin="0 20 0 20" />
-                        <TextBlock Text="Çek Listesi" FontSize="20" FontWeight="Bold" Margin="0 0 0 10" />
-                        <local:CekControl x:Name="cekControl" />
+                        <local:KrediControl x:Name="krediControl"/>
+                        <Separator Margin="0,20,0,20"/>
+                        <local:CekControl x:Name="cekControl"/>
                     </StackPanel>
                 </ScrollViewer>
             </TabItem>
-
             <TabItem Header="Sabit &amp; Değişken Ödemeler">
                 <ScrollViewer VerticalScrollBarVisibility="Auto">
                     <StackPanel Margin="10">
-                        <TextBlock Text="Sabit Ödemeler" FontSize="20" FontWeight="Bold" Margin="0 0 0 10"/>
-                        <local:SabitGiderControl x:Name="sabitGiderControl" />
-                        <Separator Margin="0 20 0 20"/>
-                        <TextBlock Text="Değişken Ödemeler" FontSize="20" FontWeight="Bold" Margin="0 0 0 10"/>
-                        <local:GenelOdemeControl x:Name="genelOdemeControl" />
-                        <Separator Margin="0 20 0 20"/>
-                        <TextBlock Text="Otomatik Gider Şablonları" FontSize="20" FontWeight="Bold" Margin="0 0 0 10"/>
-                        <local:DegiskenOdemeSablonuControl x:Name="degiskenOdemeSablonuControl" />
+                        <local:SabitGiderControl x:Name="sabitGiderControl"/>
+                        <Separator Margin="0,20,0,20"/>
+                        <local:GenelOdemeControl x:Name="genelOdemeControl"/>
+                        <Separator Margin="0,20,0,20"/>
+                        <local:DegiskenOdemeSablonuControl />
                     </StackPanel>
                 </ScrollViewer>
             </TabItem>
-
             <TabItem Header="💳 Kredi Kartları">
                 <TabControl>
                     <TabItem Header="Kart Tanımları">
-                        <local:KrediKartiControl x:Name="krediKartiControl" />
+                        <local:KrediKartiControl />
                     </TabItem>
                     <TabItem Header="Ödeme Kayıtları">
-                        <local:KrediKartiOdemeControl x:Name="krediKartiOdemeControl" />
+                        <local:KrediKartiOdemeControl x:Name="krediKartiOdemeControl"/>
                     </TabItem>
                 </TabControl>
             </TabItem>
-
         </TabControl>
     </Grid>
 </Window>

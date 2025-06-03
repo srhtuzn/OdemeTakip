@@ -22,6 +22,7 @@ namespace OdemeTakip.Desktop
             _isEdit = gider != null;
 
             SirketleriYukle();
+            CariFirmalariYukle();  // 🔥 Cari Firmalar
 
             if (_isEdit)
             {
@@ -32,6 +33,7 @@ namespace OdemeTakip.Desktop
                 dpBaslangic.SelectedDate = _gider.BaslangicTarihi;
 
                 cmbSirketAdi.SelectedValue = _gider.CompanyId;
+                cmbCariFirma.SelectedValue = _gider.CariFirmaId; // 🔥 Cari Firma Seçimi
 
                 foreach (ComboBoxItem item in cmbParaBirimi.Items)
                 {
@@ -58,6 +60,18 @@ namespace OdemeTakip.Desktop
             cmbSirketAdi.ItemsSource = _db.Companies
                 .Where(c => c.IsActive)
                 .ToList();
+            cmbSirketAdi.DisplayMemberPath = "Name";
+            cmbSirketAdi.SelectedValuePath = "Id";
+        }
+
+        private void CariFirmalariYukle()
+        {
+            cmbCariFirma.ItemsSource = _db.CariFirmalar
+                .Where(c => c.IsActive)
+                .OrderBy(c => c.Name)
+                .ToList();
+            cmbCariFirma.DisplayMemberPath = "Name";
+            cmbCariFirma.SelectedValuePath = "Id";
         }
 
         private string SabitGiderKoduUret()
@@ -92,6 +106,9 @@ namespace OdemeTakip.Desktop
 
             if (cmbSirketAdi.SelectedValue is int selectedId)
                 _gider.CompanyId = selectedId;
+
+            if (cmbCariFirma.SelectedValue is int cariFirmaId) // 🔥 Cari Firma Kaydet
+                _gider.CariFirmaId = cariFirmaId;
 
             if (!_isEdit)
                 _gider.OdemeKodu = SabitGiderKoduUret();

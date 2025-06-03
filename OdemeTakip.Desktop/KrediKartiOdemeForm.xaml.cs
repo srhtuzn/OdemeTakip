@@ -29,7 +29,9 @@ namespace OdemeTakip.Desktop
 
         private void KartlariYukle()
         {
-            var kartlar = _db.KrediKartlari.Where(k => k.IsActive).ToList();
+            var kartlar = _db.KrediKartlari
+                .Where(k => k.IsActive)
+                .ToList();
             cmbKartlar.ItemsSource = kartlar;
             cmbKartlar.DisplayMemberPath = "CardName";
             cmbKartlar.SelectedValuePath = "Id";
@@ -49,11 +51,12 @@ namespace OdemeTakip.Desktop
         private void FormuDoldur()
         {
             txtAciklama.Text = _odeme.Aciklama;
-            txtTutar.Text = _odeme.Tutar.ToString();
+            txtTutar.Text = _odeme.Tutar.ToString("N2");
             dpOdemeTarihi.SelectedDate = _odeme.OdemeTarihi;
             txtBanka.Text = _odeme.Banka;
             cmbKartlar.SelectedItem = _db.KrediKartlari.FirstOrDefault(k => k.CardName == _odeme.KartAdi);
         }
+
         private string KrediKartiOdemeKoduUret()
         {
             int mevcut = _db.KrediKartiOdemeleri.Count() + 1;
@@ -69,7 +72,17 @@ namespace OdemeTakip.Desktop
             }
 
             _odeme.KartAdi = _seciliKart.CardName;
-            _odeme.OwnerName = _seciliKart.OwnerName;
+
+            if (_seciliKart.CompanyId.HasValue)
+            {
+                _odeme.CompanyId = _seciliKart.CompanyId;  // 🔥 Artık CompanyId atıyoruz
+            }
+            else
+            {
+                MessageBox.Show("Seçilen karta bağlı bir şirket bulunamadı.");
+                return;
+            }
+
             _odeme.Aciklama = txtAciklama.Text.Trim();
             _odeme.Banka = txtBanka.Text.Trim();
             _odeme.IsActive = true;
@@ -87,9 +100,9 @@ namespace OdemeTakip.Desktop
                 return;
             }
             _odeme.OdemeTarihi = dpOdemeTarihi.SelectedDate.Value;
+
             if (!_isEdit)
                 _odeme.OdemeKodu = KrediKartiOdemeKoduUret();
-
 
             if (_isEdit)
                 _db.KrediKartiOdemeleri.Update(_odeme);
