@@ -1,0 +1,37 @@
+﻿<Window x:Class="OdemeTakip.Desktop.KrediKartiHarcamaForm"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Kredi Kartı Harcama Ekle/Güncelle" Height="500" Width="500" 
+        WindowStartupLocation="CenterScreen" ResizeMode="NoResize">
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Margin="0,0,0,20" VerticalAlignment="Top">
+            <TextBlock Text="Kart Seçin:" FontWeight="Bold"/>
+            <ComboBox x:Name="cmbKrediKartlari" DisplayMemberPath="CardName" SelectedValuePath="Id" Height="35" Margin="0,5,0,15"/>
+
+            <TextBlock Text="Açıklama:" FontWeight="Bold"/>
+            <TextBox x:Name="txtAciklama" Height="35" Margin="0,5,0,15" MaxLength="250"/>
+
+            <TextBlock Text="Harcama Tutarı (₺):" FontWeight="Bold"/>
+            <TextBox x:Name="txtTutar" Height="35" Margin="0,5,0,15"/>
+
+            <TextBlock Text="Taksit Sayısı:" FontWeight="Bold"/>
+            <TextBox x:Name="txtTaksitSayisi" Height="35" Margin="0,5,0,15" Text="1"/>
+
+            <TextBlock Text="Harcama Tarihi:" FontWeight="Bold"/>
+            <DatePicker x:Name="dpHarcamaTarihi" Height="35" Margin="0,5,0,15"/>
+
+            <TextBlock Text="Ekstra Bilgi (Opsiyonel):" FontWeight="Bold"/>
+            <TextBox x:Name="txtEkstraBilgi" Height="35" Margin="0,5,0,15" MaxLength="150"/>
+        </StackPanel>
+
+        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,20,0,0">
+            <Button Content="Kaydet" Width="120" Height="40" Margin="0,0,10,0" Click="BtnKaydet_Click"/>
+            <Button Content="İptal" Width="120" Height="40" Click="BtnIptal_Click"/>
+        </StackPanel>
+    </Grid>
+</Window>

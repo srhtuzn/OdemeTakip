@@ -18,10 +18,11 @@ namespace OdemeTakip.Desktop
     {
         private readonly List<OdemeViewModel> _tumOdemelerSource = new();
 
-
+        public bool IsCurrentUserAdmin => App.CurrentUser?.Role == UserRole.Admin;
         public TumOdemelerView()
         {
             InitializeComponent();
+            DataContext = this;
             CmbOdemeDurumu.SelectedIndex = 0; // Varsayılan "Ödenecekler"
         }
 
@@ -149,11 +150,13 @@ namespace OdemeTakip.Desktop
             var aySonu = ayBaslangic.AddMonths(1).AddDays(-1);
 
             var krediKartiOdemeler = db.KrediKartiOdemeleri.AsNoTracking()
-                .Include(x => x.Company)
-                .Where(x => x.IsActive &&
-                            (!odemeDurumuFiltresi.HasValue || x.OdenmeDurumu == odemeDurumuFiltresi) &&
-                            x.OdemeTarihi >= ayBaslangic && x.OdemeTarihi <= aySonu)
-                .Select(MapKrediKartiOdeme);
+             .Include(x => x.Company)
+             .Include(x => x.KrediKarti) // 🔥 EKLENDİ
+             .Where(x => x.IsActive &&
+                 (!odemeDurumuFiltresi.HasValue || x.OdenmeDurumu == odemeDurumuFiltresi) &&
+                 x.OdemeTarihi >= ayBaslangic && x.OdemeTarihi <= aySonu)
+     .Select(MapKrediKartiOdeme);
+
 
             _tumOdemelerSource.AddRange(krediKartiOdemeler);
 
@@ -168,7 +171,7 @@ namespace OdemeTakip.Desktop
                 Id = gider.Id,
                 KaynakId = gider.Id,
                 Kod = gider.OdemeKodu ?? "",
-                Aciklama = $"{gider.GiderAdi} ({tarih:MMMM yyyy})",
+                Aciklama = BuildAciklama($"{gider.GiderAdi} ({tarih:MMMM yyyy})", gider.Aciklama, gider.FaturaNo),
                 Tarih = tarih,
                 Tutar = gider.Tutar,
                 ParaBirimi = gider.ParaBirimi ?? "TL",
@@ -183,12 +186,18 @@ namespace OdemeTakip.Desktop
                 TaksitNo = 0
             };
 
+        private static string GetAyYil(DateTime? tarih)
+        {
+            if (tarih == null) return "";
+            var dt = tarih.Value;
+            return $"{dt:MMMM yyyy}";
+        }
         private static OdemeViewModel MapGenelOdeme(GenelOdeme odeme) => new()
         {
             Id = odeme.Id,
             KaynakId = odeme.Id,
             Kod = odeme.OdemeKodu ?? "",
-            Aciklama = odeme.Aciklama ?? "",
+            Aciklama = BuildAciklama(odeme.Aciklama, "", odeme.FaturaNo),
             Tarih = odeme.OdemeTarihi ?? DateTime.MinValue,
             Tutar = odeme.Tutar,
             ParaBirimi = odeme.ParaBirimi ?? "TL",
@@ -228,19 +237,31 @@ namespace OdemeTakip.Desktop
             Id = odeme.Id,
             KaynakId = odeme.Id,
             Kod = odeme.OdemeKodu ?? "",
-            Aciklama = odeme.Aciklama ?? "",
+            Aciklama = GetKrediKartiAciklama(odeme),
             Tarih = odeme.OdemeTarihi ?? DateTime.MinValue,
             Tutar = odeme.Tutar,
             ParaBirimi = "TL",
             KaynakModul = "Kredi Kartı",
             OdenmeDurumu = odeme.OdenmeDurumu,
-            SirketAdi = odeme.Company?.Name ?? "",        // 🔥 Şirket Adı burası
-            CariFirmaAdi = "",                            // 🔥 Burada cari firma yok zaten kredi kartı ödemelerinde
+            SirketAdi = odeme.Company?.Name ?? "",
+            CariFirmaAdi = "", // Kart ödemelerinde cari yok
             OdeyenKullaniciAdi = odeme.OdeyenKullaniciAdi,
             Durum = odeme.OdenmeDurumu,
             VadeTarihi = odeme.OdemeTarihi ?? DateTime.MinValue,
             TaksitNo = 0
         };
+        private static string GetKrediKartiAciklama(KrediKartiOdeme odeme)
+        {
+            var kartAdi = odeme.KartAdi ?? "Bilinmeyen Kart";
+            var son4 = odeme.KrediKarti?.CardNumberLast4 ?? "XXXX";
+            var limit = odeme.KrediKarti?.Limit;
+            var limitYazi = limit.HasValue ? $"Limit: {limit.Value:N0} TL" : "";
+            var ayYil = GetAyYil(odeme.OdemeTarihi);
+
+            return $"{kartAdi} - {son4} {limitYazi} - {ayYil} Harcaması".Replace("  ", " ").Trim();
+        }
+
+
 
         private static OdemeViewModel MapCek(Cek cek) => new()
         {
@@ -408,11 +429,24 @@ namespace OdemeTakip.Desktop
             DgSonrakiTaksitler.ItemsSource = sonrakiTaksitlerListesi;
         }
 
+        private static string BuildAciklama(string anaBaslik, string aciklama, string? faturaNo)
+        {
+            var list = new List<string>();
+
+            if (!string.IsNullOrWhiteSpace(anaBaslik))
+                list.Add(anaBaslik);
+
+            if (!string.IsNullOrWhiteSpace(aciklama))
+                list.Add(aciklama);
+
+            if (!string.IsNullOrWhiteSpace(faturaNo))
+                list.Add($"(Fatura: {faturaNo})");
+
+            return string.Join(" - ", list);
+        }
 
 
-        // BtnOdenme_Click, GeriAlOdemeDurumu, IsaretleOdendi, UpdatePaymentStatus, BulEntity metotları
-        // bir önceki cevaptaki gibi kalacak, sadece namespace ve OdemeViewModel alan adları kontrol edilmeli.
-        // Onları tekrar ekliyorum:
+    
 
         private void BtnOdenmeDurumuDegistir_Click(object sender, RoutedEventArgs e) // Click olayının adı XAML ile eşleşmeli
         {
@@ -540,6 +574,78 @@ namespace OdemeTakip.Desktop
                 return false;
             }
         }
+        private void BtnOdemeIslem_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is not Button btn || btn.Tag is not OdemeViewModel odeme)
+                return;
+
+            var db = App.DbContext;
+            if (db == null)
+            {
+                MessageBox.Show("Veritabanı bağlantısı kurulamadı.", "Hata", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            if (!odeme.OdenmeDurumu)
+            {
+                var onay = MessageBox.Show($"'{odeme.Kod} - {odeme.Aciklama}' ödemesi 'Ödendi' olarak işaretlensin mi?", "Ödeme Onayı", MessageBoxButton.YesNo, MessageBoxImage.Question);
+                if (onay != MessageBoxResult.Yes) return;
+
+                List<BankaHesabi> bankaHesaplari;
+                try
+                {
+                    bankaHesaplari = odeme.KaynakModul == "Kredi Kartı" && !string.IsNullOrEmpty(odeme.SirketAdi)
+                        ? db.BankaHesaplari.Include(x => x.Company).Where(x => x.IsActive && x.Company != null && x.Company.Name == odeme.SirketAdi).ToList()
+                        : db.BankaHesaplari.Where(x => x.IsActive).ToList();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Banka hesapları yüklenirken hata: {ex.Message}", "Hata", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
+
+                var popup = new OdemeOnayPopup(bankaHesaplari);
+                if (popup.ShowDialog() == true)
+                {
+                    if (!popup.SecilenTarih.HasValue || string.IsNullOrEmpty(popup.SecilenHesapKodu))
+                    {
+                        MessageBox.Show("Lütfen geçerli bir ödeme tarihi ve hesap seçin.", "Eksik Bilgi", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        return;
+                    }
+
+                    bool basarili = IsaretleOdendi(db, odeme, popup.SecilenTarih.Value, popup.SecilenHesapKodu);
+                    if (basarili)
+                    {
+                        MessageBox.Show("Ödeme başarıyla işaretlendi.", "Başarılı", MessageBoxButton.OK, MessageBoxImage.Information);
+                        FiltreleVeYukle();
+                    }
+                }
+            }
+            else
+            {
+                if (App.CurrentUser == null || App.CurrentUser.Role != UserRole.Admin)
+                {
+                    MessageBox.Show("Bu işlemi gerçekleştirmek için Admin yetkisine sahip olmanız gerekmektedir.", "Yetki Hatası", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+
+                if (MessageBox.Show($"'{odeme.Kod} - {odeme.Aciklama}' ödemesi geri alınsın mı?", "Geri Alma Onayı", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+                {
+                    var sifrePopup = new SifreDogrulamaPopup();
+                    if (sifrePopup.ShowDialog() == true && sifrePopup.SifreDogru)
+                    {
+                        bool sonuc = GeriAlOdemeDurumu(db, odeme);
+                        if (sonuc)
+                        {
+                            MessageBox.Show("Ödeme durumu geri alındı.", "Başarılı", MessageBoxButton.OK, MessageBoxImage.Information);
+                            FiltreleVeYukle();
+                        }
+                    }
+                }
+            }
+        }
+
+
 
         private void SetPropertyValue(object entity, string propertyName, object? value)
         {

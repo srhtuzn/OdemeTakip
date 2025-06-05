@@ -1,7 +1,12 @@
 ﻿<UserControl x:Class="OdemeTakip.Desktop.TumOdemelerView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:converters="clr-namespace:OdemeTakip.Desktop.Converters"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              Loaded="UserControl_Loaded">
+    <UserControl.Resources>
+        <converters:OdemeDurumuToButtonTextConverter x:Key="OdemeDurumuToButtonTextConverter"/>
+        <!-- diğer kaynaklar -->
+    </UserControl.Resources>
 
     <Grid Margin="10">
         <Grid.RowDefinitions>
@@ -25,6 +30,7 @@
             <Button x:Name="BtnFiltreleYenile" Content="🔄 Yenile / Filtrele" Click="BtnFiltreleYenile_Click" />
         </StackPanel>
 
+        <!-- Ana Ödemeler Tablosu -->
         <DataGrid x:Name="DgOdemeler"
                   Grid.Row="1"
                   AutoGenerateColumns="False"
@@ -45,10 +51,43 @@
                 <DataGridTextColumn Header="Ö.Tarihi" Binding="{Binding OdemeTarihi, StringFormat=dd.MM.yyyy}" Width="100"/>
                 <DataGridTextColumn Header="Ö.Banka" Binding="{Binding OdemeBankasi}" Width="120"/>
                 <DataGridTextColumn Header="Ödeyen" Binding="{Binding OdeyenKullaniciAdi}" Width="120"/>
+
+                <!-- İşlem Butonu -->
+                <DataGridTemplateColumn Header="İşlem" Width="100">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Button Content="{Binding OdenmeDurumu, Converter={StaticResource OdemeDurumuToButtonTextConverter}}"
+                                    Click="BtnOdemeIslem_Click"
+                                    Tag="{Binding}" 
+                                    Padding="4,2" MinWidth="60" HorizontalAlignment="Center">
+                                <Button.Style>
+                                    <Style TargetType="Button">
+                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                        <Style.Triggers>
+                                            <!-- Ödenmemiş ise Öde butonu görünür -->
+                                            <DataTrigger Binding="{Binding OdenmeDurumu}" Value="False">
+                                                <Setter Property="Visibility" Value="Visible"/>
+                                            </DataTrigger>
+                                            <!-- Ödenmiş ve kullanıcı admin ise Geri Al butonu görünür -->
+                                            <MultiDataTrigger>
+                                                <MultiDataTrigger.Conditions>
+                                                    <Condition Binding="{Binding OdenmeDurumu}" Value="True"/>
+                                                    <Condition Binding="{Binding RelativeSource={RelativeSource AncestorType=UserControl}, Path=DataContext.IsCurrentUserAdmin}" Value="True"/>
+                                                </MultiDataTrigger.Conditions>
+                                                <Setter Property="Visibility" Value="Visible"/>
+                                            </MultiDataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Button.Style>
+                            </Button>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
             </DataGrid.Columns>
         </DataGrid>
 
-        <!-- Sonraki Taksitler Expander -->
+        <!-- Sonraki Taksitler Expander (Butonsuz!) -->
         <Expander x:Name="ExpanderSonrakiTaksitler" Header="📅 Sonraki Taksitler" Grid.Row="2" Visibility="Collapsed" IsExpanded="False" Margin="0,10,0,0">
             <DataGrid x:Name="DgSonrakiTaksitler"
                       AutoGenerateColumns="False"
@@ -61,6 +100,7 @@
                     <DataGridTextColumn Header="Vade Tarihi" Binding="{Binding VadeTarihi, StringFormat=dd.MM.yyyy}" Width="150"/>
                     <DataGridTextColumn Header="Tutar" Binding="{Binding Tutar, StringFormat=N2}" Width="150"/>
                     <DataGridTextColumn Header="Durum" Binding="{Binding Durum}" Width="100"/>
+                    <!-- Burada buton yok! -->
                 </DataGrid.Columns>
             </DataGrid>
         </Expander>

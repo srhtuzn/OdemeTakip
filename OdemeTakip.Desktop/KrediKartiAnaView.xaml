@@ -1,0 +1,208 @@
+﻿<UserControl x:Class="OdemeTakip.Desktop.KrediKartiAnaView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:local="clr-namespace:OdemeTakip.Desktop"
+             mc:Ignorable="d" 
+             Background="White">
+
+    <UserControl.Resources>
+        <!-- Placeholder stilini merkezi olarak tanımla -->
+        <Style x:Key="SearchTextBoxStyle" TargetType="TextBox">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TextBox">
+                        <Grid>
+                            <ScrollViewer x:Name="PART_ContentHost"
+                                          VerticalAlignment="Center"
+                                          Margin="5,0"/>
+                            <TextBlock Text="{TemplateBinding Tag}"
+                                       IsHitTestVisible="False"
+                                       Foreground="Gray"
+                                       VerticalAlignment="Center"
+                                       Margin="5,0,0,0"
+                                       Visibility="{Binding Text, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource StringNullOrEmptyToVisibilityConverter}}"/>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="MinWidth" Value="200"/>
+            <Setter Property="Height" Value="30"/>
+            <Setter Property="Margin" Value="0,0,0,10"/>
+        </Style>
+    </UserControl.Resources>
+
+    <Grid Margin="10">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="2*"/>
+            <ColumnDefinition Width="3*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- Kartlar Bölümü -->
+        <StackPanel Grid.Column="0" Margin="0,0,10,0">
+            <TextBlock Text="💳 Kredi Kartları" 
+                       FontSize="18" 
+                       FontWeight="Bold" 
+                       Margin="0,0,0,10"/>
+
+            <!-- Filtre TextBox -->
+            <TextBox x:Name="txtKartAra" 
+                     Style="{StaticResource SearchTextBoxStyle}"
+                     Tag="Kart ara..."
+                     TextChanged="TxtKartAra_TextChanged"/>
+
+            <DataGrid x:Name="dgKrediKartlari" 
+                      AutoGenerateColumns="False" 
+                      CanUserAddRows="False" 
+                      Height="250"
+                      IsReadOnly="True" 
+                      AlternatingRowBackground="#FFF5F5F5"
+                      SelectionChanged="dgKrediKartlari_SelectionChanged"
+                      GridLinesVisibility="None">
+                <DataGrid.ColumnHeaderStyle>
+                    <Style TargetType="DataGridColumnHeader">
+                        <Setter Property="FontWeight" Value="Bold"/>
+                        <Setter Property="Background" Value="#FFEEEEEE"/>
+                        <Setter Property="Padding" Value="5"/>
+                    </Style>
+                </DataGrid.ColumnHeaderStyle>
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Kart Adı" 
+                                       Binding="{Binding CardName}" 
+                                       Width="*"/>
+                    <DataGridTextColumn Header="Son 4" 
+                                       Binding="{Binding CardNumberLast4}" 
+                                       Width="100"/>
+                    <DataGridTextColumn Header="Limit (₺)" 
+                                       Binding="{Binding Limit, StringFormat=N0}" 
+                                       Width="100"/>
+                </DataGrid.Columns>
+            </DataGrid>
+
+            <StackPanel Orientation="Horizontal" 
+                        Margin="0,10,0,0" 
+                        HorizontalAlignment="Center">
+                <Button Content="➕ Ekle" 
+                        Width="90" 
+                        Margin="5" 
+                        Click="BtnKartEkle_Click"/>
+                <Button Content="✏️ Düzenle" 
+                        Width="90" 
+                        Margin="5" 
+                        Click="BtnKartDuzenle_Click"/>
+                <Button Content="🗑️ Sil" 
+                        Width="90" 
+                        Margin="5" 
+                        Click="BtnKartSil_Click"/>
+            </StackPanel>
+        </StackPanel>
+
+        <!-- Harcamalar ve Taksitler Bölümü -->
+        <TabControl Grid.Column="1">
+            <TabItem Header="🛒 Harcamalar">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Harcama Filtre TextBox -->
+                    <TextBox x:Name="txtHarcamaAra" 
+                             Grid.Row="0"
+                             Style="{StaticResource SearchTextBoxStyle}"
+                             Tag="Harcama ara..."
+                             TextChanged="TxtHarcamaAra_TextChanged"/>
+
+                    <DataGrid x:Name="dgHarcamaListesi" 
+                              Grid.Row="1" 
+                              AutoGenerateColumns="False" 
+                              CanUserAddRows="False" 
+                              IsReadOnly="True"
+                              AlternatingRowBackground="#FFF5F5F5"
+                              GridLinesVisibility="None">
+                        <DataGrid.ColumnHeaderStyle>
+                            <Style TargetType="DataGridColumnHeader">
+                                <Setter Property="FontWeight" Value="Bold"/>
+                                <Setter Property="Background" Value="#FFEEEEEE"/>
+                                <Setter Property="Padding" Value="5"/>
+                            </Style>
+                        </DataGrid.ColumnHeaderStyle>
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Açıklama" 
+                                               Binding="{Binding Aciklama}" 
+                                               Width="*"/>
+                            <DataGridTextColumn Header="Tutar (₺)" 
+                                               Binding="{Binding Tutar, StringFormat=N2}" 
+                                               Width="100"/>
+                            <DataGridTextColumn Header="Taksit" 
+                                               Binding="{Binding TaksitSayisi}" 
+                                               Width="80"/>
+                            <DataGridTextColumn Header="Harcama Tarihi" 
+                                               Binding="{Binding HarcamaTarihi, StringFormat=d}" 
+                                               Width="100"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+
+                    <StackPanel Orientation="Horizontal" 
+                                Grid.Row="2" 
+                                HorizontalAlignment="Center" 
+                                Margin="0,10,0,0">
+                        <Button Content="➕ Harcama Ekle" 
+                                Width="120" 
+                                Margin="5" 
+                                Click="BtnHarcamaEkle_Click"/>
+                        <Button Content="✏️ Düzenle" 
+                                Width="100" 
+                                Margin="5" 
+                                Click="BtnHarcamaDuzenle_Click"/>
+                        <Button Content="🗑️ Sil" 
+                                Width="90" 
+                                Margin="5" 
+                                Click="BtnHarcamaSil_Click"/>
+                    </StackPanel>
+                </Grid>
+            </TabItem>
+
+            <TabItem Header="📅 Taksitli Ödemeler">
+                <DataGrid x:Name="dgTaksitliOdemeler" 
+              AutoGenerateColumns="False" 
+              CanUserAddRows="False" 
+              IsReadOnly="True"
+              AlternatingRowBackground="#FFF5F5F5"
+              GridLinesVisibility="None">
+                    <DataGrid.ColumnHeaderStyle>
+                        <Style TargetType="DataGridColumnHeader">
+                            <Setter Property="FontWeight" Value="Bold"/>
+                            <Setter Property="Background" Value="#FFEEEEEE"/>
+                            <Setter Property="Padding" Value="5"/>
+                        </Style>
+                    </DataGrid.ColumnHeaderStyle>
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Açıklama" 
+                        Binding="{Binding KrediKartiHarcama.Aciklama}" 
+                        Width="*" />
+                        <DataGridTextColumn Header="Taksit No" 
+                        Binding="{Binding TaksitNo}" 
+                        Width="80" />
+                        <DataGridTextColumn Header="Tutar (₺)" 
+                        Binding="{Binding Tutar, StringFormat=N2}" 
+                        Width="100" />
+                        <DataGridTextColumn Header="Vade Tarihi" Binding="{Binding OdemeTarihi, StringFormat=dd.MM.yyyy}" Width="100" />
+
+                        <DataGridTextColumn Header="Son Ödeme Tarihi" Binding="{Binding KrediKarti.PaymentDueDate, StringFormat=dd.MM.yyyy}" Width="100" />
+
+                        <DataGridTextColumn Header="Durum" Width="80">
+                            <DataGridTextColumn.Binding>
+                                <Binding Path="OdenmeDurumu" Converter="{StaticResource BooleanToStatusStringConverter}" />
+                            </DataGridTextColumn.Binding>
+                        </DataGridTextColumn>
+                    </DataGrid.Columns>
+
+                </DataGrid>
+            </TabItem>
+
+        </TabControl>
+    </Grid>
+</UserControl>

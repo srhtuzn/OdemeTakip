@@ -2,6 +2,8 @@
 using System.Windows;
 using OdemeTakip.Data;
 using OdemeTakip.Entities;
+using OdemeTakip.Desktop.Helpers;
+
 
 namespace OdemeTakip.Desktop
 {
@@ -90,8 +92,10 @@ namespace OdemeTakip.Desktop
                 foreach (var odeme in eskiOdemeler)
                 {
                     odeme.CompanyId = _kart.CompanyId;
+                    odeme.KrediKartiId = _kart.Id;   // 🔥 Bu satırı EKLE!
                 }
                 _db.KrediKartiOdemeleri.UpdateRange(eskiOdemeler);
+
             }
             else
             {
@@ -99,6 +103,10 @@ namespace OdemeTakip.Desktop
             }
 
             _db.SaveChanges();
+
+            // 🔥 KART EKLENDİKTEN SONRA 0 TL'LİK ÖDEME KAYDI OLUŞTUR
+            OdemeTakip.Desktop.Helpers.KrediKartiOdemeGenerator.Uygula(_db);
+
             DialogResult = true;
             Close();
         }

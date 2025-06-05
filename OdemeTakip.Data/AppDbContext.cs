@@ -18,6 +18,7 @@ namespace OdemeTakip.Data
         public DbSet<Banka> Bankalar { get; set; }
         public DbSet<BankaHesabi> BankaHesaplari { get; set; }
         public DbSet<KrediKartiOdeme> KrediKartiOdemeleri { get; set; }
+        public DbSet<KrediKartiHarcama> KrediKartiHarcamalari { get; set; } // 🆕 EKLENDİ
         public DbSet<DegiskenOdeme> DegiskenOdemeler { get; set; }
         public DbSet<DegiskenOdemeSablonu> DegiskenOdemeSablonlari { get; set; }
         public DbSet<KrediTaksit> KrediTaksitler { get; set; }

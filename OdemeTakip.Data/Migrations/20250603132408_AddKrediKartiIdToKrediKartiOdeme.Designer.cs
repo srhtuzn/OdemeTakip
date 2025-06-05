@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using OdemeTakip.Data;
 
@@ -11,9 +12,11 @@ using OdemeTakip.Data;
 namespace OdemeTakip.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250603132408_AddKrediKartiIdToKrediKartiOdeme")]
+    partial class AddKrediKartiIdToKrediKartiOdeme
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -549,44 +552,6 @@ namespace OdemeTakip.Data.Migrations
                     b.ToTable("KrediKartlari");
                 });
 
-            modelBuilder.Entity("OdemeTakip.Entities.KrediKartiHarcama", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Aciklama")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("HarcamaTarihi")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("KrediKartiId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ParaBirimi")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("TaksitSayisi")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("Tutar")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("KrediKartiId");
-
-                    b.ToTable("KrediKartiHarcamalari");
-                });
-
             modelBuilder.Entity("OdemeTakip.Entities.KrediKartiOdeme", b =>
                 {
                     b.Property<int>("Id")
@@ -612,9 +577,6 @@ namespace OdemeTakip.Data.Migrations
 
                     b.Property<string>("KartAdi")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("KrediKartiHarcamaId")
-                        .HasColumnType("int");
 
                     b.Property<int?>("KrediKartiId")
                         .HasColumnType("int");
@@ -646,8 +608,6 @@ namespace OdemeTakip.Data.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CompanyId");
-
-                    b.HasIndex("KrediKartiHarcamaId");
 
                     b.HasIndex("KrediKartiId");
 
@@ -854,26 +814,11 @@ namespace OdemeTakip.Data.Migrations
                     b.Navigation("Company");
                 });
 
-            modelBuilder.Entity("OdemeTakip.Entities.KrediKartiHarcama", b =>
-                {
-                    b.HasOne("OdemeTakip.Entities.KrediKarti", "KrediKarti")
-                        .WithMany()
-                        .HasForeignKey("KrediKartiId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("KrediKarti");
-                });
-
             modelBuilder.Entity("OdemeTakip.Entities.KrediKartiOdeme", b =>
                 {
                     b.HasOne("OdemeTakip.Entities.Company", "Company")
                         .WithMany()
                         .HasForeignKey("CompanyId");
-
-                    b.HasOne("OdemeTakip.Entities.KrediKartiHarcama", "KrediKartiHarcama")
-                        .WithMany()
-                        .HasForeignKey("KrediKartiHarcamaId");
 
                     b.HasOne("OdemeTakip.Entities.KrediKarti", "KrediKarti")
                         .WithMany()
@@ -882,8 +827,6 @@ namespace OdemeTakip.Data.Migrations
                     b.Navigation("Company");
 
                     b.Navigation("KrediKarti");
-
-                    b.Navigation("KrediKartiHarcama");
                 });
 
             modelBuilder.Entity("OdemeTakip.Entities.SabitGider", b =>

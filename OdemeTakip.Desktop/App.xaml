@@ -20,6 +20,8 @@
 
             <viewmodels:DurumYaziConverter x:Key="DurumYaziConverter"/>
             <viewmodels:DurumRenkConverter x:Key="DurumRenkConverter"/>
+            <viewmodels:StringNullOrEmptyToVisibilityConverter x:Key="StringNullOrEmptyToVisibilityConverter"/>
+            <viewmodels:BooleanToStatusStringConverter x:Key="BooleanToStatusStringConverter"/>
 
             <!-- Örnek bir stil:
             <Style TargetType="Button">
@@ -30,4 +32,5 @@
             -->
         </ResourceDictionary>
     </Application.Resources>
+    
 </Application>

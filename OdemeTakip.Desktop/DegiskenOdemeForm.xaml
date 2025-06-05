@@ -1,20 +1,19 @@
 ﻿<Window x:Class="OdemeTakip.Desktop.DegiskenOdemeForm"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Değişken Ödeme" Height="479" Width="400"
+        Title="Değişken Ödeme" Height="530" Width="400"
         WindowStartupLocation="CenterOwner" ResizeMode="NoResize">
 
     <Grid Margin="10">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <StackPanel Margin="0,0,0,10">
-            <TextBlock Text="Gider Türü:"/>
-            <ComboBox x:Name="cmbGiderTuru" IsEditable="True">
+        <StackPanel Grid.Row="0" Margin="0,0,0,10">
+            <Label Content="Gider Türü:" Target="{Binding ElementName=cmbGiderTuru}" />
+            <ComboBox x:Name="cmbGiderTuru" IsEditable="True" >
                 <ComboBoxItem Content="Elektrik"/>
                 <ComboBoxItem Content="Su"/>
                 <ComboBoxItem Content="Doğalgaz"/>
@@ -22,36 +21,36 @@
                 <ComboBoxItem Content="Telefon"/>
             </ComboBox>
 
-            <TextBlock Text="Tutar:" Margin="0,10,0,0"/>
-            <TextBox x:Name="txtTutar"/>
+            <Label Content="Tutar:" Target="{Binding ElementName=txtTutar}" Margin="0,10,0,0"/>
+            <TextBox x:Name="txtTutar" />
 
-            <TextBlock Text="Fatura No:" Margin="0,10,0,0"/>
-            <TextBox x:Name="txtFaturaNo"/>
+            <Label Content="Fatura No:" Target="{Binding ElementName=txtFaturaNo}" Margin="0,10,0,0"/>
+            <TextBox x:Name="txtFaturaNo" />
 
-            <TextBlock Text="Tarih:" Margin="0,10,0,0"/>
-            <DatePicker x:Name="dpTarih"/>
+            <Label Content="Tarih:" Target="{Binding ElementName=dpTarih}" Margin="0,10,0,0"/>
+            <DatePicker x:Name="dpTarih" />
 
-            <TextBlock Text="Açıklama:" Margin="0,10,0,0"/>
-            <TextBox x:Name="txtAciklama"/>
+            <Label Content="Açıklama:" Target="{Binding ElementName=txtAciklama}" Margin="0,10,0,0"/>
+            <TextBox x:Name="txtAciklama" />
 
-            <TextBlock Text="Para Birimi:" Margin="0,10,0,0"/>
-            <ComboBox x:Name="cmbParaBirimi">
+            <Label Content="Para Birimi:" Target="{Binding ElementName=cmbParaBirimi}" Margin="0,10,0,0"/>
+            <ComboBox x:Name="cmbParaBirimi" >
                 <ComboBoxItem Content="TL"/>
                 <ComboBoxItem Content="USD"/>
                 <ComboBoxItem Content="EUR"/>
             </ComboBox>
 
-            <TextBlock Text="Şirket:" Margin="0,10,0,0"/>
+            <Label Content="Şirket:" Target="{Binding ElementName=cmbSirket}" Margin="0,10,0,0"/>
             <ComboBox x:Name="cmbSirket"/>
-        
-            <Label Content="Cari Firma:" />
-            <ComboBox x:Name="cmbCariFirma"  />
 
+            <Label Content="Cari Firma:" Target="{Binding ElementName=cmbCariFirma}" Margin="0,10,0,0"/>
+            <ComboBox x:Name="cmbCariFirma"/>
         </StackPanel>
 
-        <StackPanel Orientation="Horizontal" Grid.Row="3" HorizontalAlignment="Right" Margin="0,10,0,0">
+        <StackPanel Orientation="Horizontal" Grid.Row="2" HorizontalAlignment="Right" Margin="0,10,0,0">
             <Button Content="Kaydet" Width="80" Margin="5" Click="BtnKaydet_Click"/>
             <Button Content="İptal" Width="80" Margin="5" Click="BtnIptal_Click"/>
         </StackPanel>
     </Grid>
+
 </Window>

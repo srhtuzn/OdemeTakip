@@ -64,18 +64,10 @@
                 </ScrollViewer>
             </TabItem>
             <TabItem Header="💳 Kredi Kartları">
-                <TabControl>
-                    <TabItem Header="Kart Tanımları">
-                        <local:KrediKartiControl />
-                    </TabItem>
-                    <TabItem Header="Ödeme Kayıtları">
-                        <local:KrediKartiOdemeControl x:Name="krediKartiOdemeControl"/>
-                    </TabItem>
-                    <TabItem Header="Taksitli Ödeme Girişi">
-                        <local:KrediKartiTaksitliOdemeControl />
-                    </TabItem>
-                </TabControl>
+                <!-- KrediKartiAnaView UserControl'ü eklendi -->
+                <local:KrediKartiAnaView x:Name="krediKartiAnaViewControl"/>
             </TabItem>
+
 
         </TabControl>
     </Grid>

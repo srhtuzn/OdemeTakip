@@ -156,9 +156,6 @@ namespace OdemeTakip.Desktop
                 if (cekControl != null && cekControl.IsVisible)
                     cekControl.YenidenYukle();
 
-                if (krediKartiOdemeControl != null && krediKartiOdemeControl.IsVisible)
-                    krediKartiOdemeControl.YenidenYukle();
-
                 if (tabDashboard.IsSelected && dashboardControl != null)
                 {
                     dashboardControl.YenidenYukle(); // Satır 102 (IDE0059 için kontrol edin)

@@ -33,6 +33,16 @@ namespace OdemeTakip.Entities
         public int? TaksitNo { get; set; }
         public int? ToplamTaksit { get; set; }
         public DateTime? IlkOdemeTarihi { get; set; }
+        public int? KrediKartiId { get; set; }
+
+        [ForeignKey(nameof(KrediKartiId))]   // <-- EKLEMELİYİZ!
+        public KrediKarti? KrediKarti { get; set; }
+        public int? KrediKartiHarcamaId { get; set; }  // 🔥 Bağlı Harcama
+        public KrediKartiHarcama? KrediKartiHarcama { get; set; }  // Navigation Property
+
+
+
+
     }
 
 
