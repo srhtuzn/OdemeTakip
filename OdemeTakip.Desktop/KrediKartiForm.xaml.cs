@@ -29,7 +29,6 @@ namespace OdemeTakip.Desktop
             if (_isEdit)
             {
                 txtCardName.Text = _kart.CardName;
-                txtOwnerType.Text = _kart.OwnerType;
                 cmbOwnerCompany.SelectedValue = _kart.CompanyId;  // 🔥 Seçili Company I
                 txtCardNumberLast4.Text = _kart.CardNumberLast4;
                 txtLimit.Text = _kart.Limit.ToString();
@@ -64,7 +63,6 @@ namespace OdemeTakip.Desktop
         private void BtnKaydet_Click(object sender, RoutedEventArgs e)
         {
             _kart.CardName = txtCardName.Text.Trim();
-            _kart.OwnerType = txtOwnerType.Text.Trim();
 
             if (cmbOwnerCompany.SelectedValue is int companyId)
                 _kart.CompanyId = companyId;
@@ -103,9 +101,6 @@ namespace OdemeTakip.Desktop
             }
 
             _db.SaveChanges();
-
-            // 🔥 KART EKLENDİKTEN SONRA 0 TL'LİK ÖDEME KAYDI OLUŞTUR
-            OdemeTakip.Desktop.Helpers.KrediKartiOdemeGenerator.Uygula(_db);
 
             DialogResult = true;
             Close();

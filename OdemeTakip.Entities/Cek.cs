@@ -11,15 +11,15 @@ namespace OdemeTakip.Entities
         public string? CekNumarasi { get; set; }
         public string? SirketAdi { get; set; }
 
-        public string? FirmaAdi { get; set; }           // Çeki veren ya da alınan firma
-        public string? CekTuru { get; set; }            // "Alınan" / "Verilen"
+        public string? FirmaAdi { get; set; }         // Çeki veren ya da alınan firma
+        public string? CekTuru { get; set; }          // "Alınan" / "Verilen"
 
         [Column(TypeName = "decimal(18,2)")]
         public decimal Tutar { get; set; }
 
-        public DateTime VadeTarihi { get; set; }         // Ne zaman tahsil edilecek
+        public DateTime VadeTarihi { get; set; }      // Ne zaman tahsil edilecek
 
-        public DateTime? TahsilTarihi { get; set; }      // Tahsil edildiyse
+        public DateTime? TahsilTarihi { get; set; }   // Tahsil edildiyse
 
         public string? Banka { get; set; }
 
@@ -36,5 +36,8 @@ namespace OdemeTakip.Entities
         public CariFirma? CariFirma { get; set; }
         public string? OdeyenKullaniciAdi { get; set; }
 
+        // 👇 BURAYA EKLENECEK PROPERTY 👇
+        public string? Aciklama { get; set; } // MapCek metodunda kullanılmak üzere eklendi
+        // 👆 BURAYA EKLENECEK PROPERTY 👆
     }
 }

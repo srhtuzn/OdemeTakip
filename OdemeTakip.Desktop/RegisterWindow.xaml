@@ -1,36 +1,46 @@
 ﻿<Window x:Class="OdemeTakip.Desktop.RegisterWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Kayıt Ol" Height="508" Width="407" WindowStartupLocation="CenterScreen" Background="#FFB50202" Foreground="#FFF9F9F9">
+        Title="Kayıt Ol" SizeToContent="Height"  Width="436" 
+        WindowStartupLocation="CenterScreen" 
+        Background="#F5F7FA" 
+        WindowStyle="SingleBorderWindow" 
+        ResizeMode="NoResize">
 
-    <Grid Margin="20">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
+    <Grid Margin="0,0,-17,72">
+        <Border Background="White" CornerRadius="10" Padding="30" 
+                VerticalAlignment="Center" HorizontalAlignment="Center"
+                Effect="{DynamicResource ShadowEffect}" Width="398">
+            <StackPanel>
 
-        <TextBlock Text="Ad Soyad" Grid.Row="0"/>
-        <TextBox x:Name="FullNameTextBox" Grid.Row="1" Height="30" Margin="0,5,0,15"/>
+                <TextBlock Text="Kayıt Ol" FontSize="24" FontWeight="Bold" 
+                           HorizontalAlignment="Center" Margin="0,0,0,20" />
 
-        <TextBlock Text="E-posta" Grid.Row="2"/>
-        <TextBox x:Name="EmailTextBox" Grid.Row="3" Height="30" Margin="0,5,0,15"/>
+                <TextBlock Text="Ad Soyad" Margin="0,0,0,5" FontWeight="SemiBold"/>
+                <TextBox x:Name="FullNameTextBox" Height="35" Margin="0,0,0,15" 
+                         Style="{DynamicResource InputTextBoxStyle}" />
 
-        <TextBlock Text="Kullanıcı Adı" Grid.Row="4"/>
-        <TextBox x:Name="UsernameTextBox" Grid.Row="5" Height="30" Margin="0,5,0,15"/>
+                <TextBlock Text="E-posta" Margin="0,0,0,5" FontWeight="SemiBold"/>
+                <TextBox x:Name="EmailTextBox" Height="35" Margin="0,0,0,15" 
+                         Style="{DynamicResource InputTextBoxStyle}" />
 
-        <TextBlock Text="Şifre" Grid.Row="6"/>
-        <PasswordBox x:Name="PasswordBox" Grid.Row="7" Height="30" Margin="0,5,0,15"/>
+                <TextBlock Text="Kullanıcı Adı" Margin="0,0,0,5" FontWeight="SemiBold"/>
+                <TextBox x:Name="UsernameTextBox" Height="35" Margin="0,0,0,15" 
+                         Style="{DynamicResource InputTextBoxStyle}" />
 
-        <TextBlock Text="Şifre (Tekrar)" Grid.Row="8"/>
-        <PasswordBox x:Name="ConfirmPasswordBox" Grid.Row="8" Margin="0,18,0,141"/>
+                <TextBlock Text="Şifre" Margin="0,0,0,5" FontWeight="SemiBold"/>
+                <PasswordBox x:Name="PasswordBox" Height="35" Margin="0,0,0,15" 
+                             Style="{DynamicResource InputPasswordBoxStyle}" />
 
-        <Button Content="Kayıt Ol" Grid.Row="8" Width="100" HorizontalAlignment="Right" Click="RegisterButton_Click" Margin="0,70,0,82" Background="#FF52A90D" FontWeight="Bold" FontSize="16" Foreground="#FF5B0000"/>
+                <TextBlock Text="Şifre (Tekrar)" Margin="0,0,0,5" FontWeight="SemiBold"/>
+                <PasswordBox x:Name="ConfirmPasswordBox" Height="35" Margin="0,0,0,25" 
+                             Style="{DynamicResource InputPasswordBoxStyle}" />
+
+                <Button Content="Kayıt Ol" Height="40" Width="120" 
+                        HorizontalAlignment="Center" 
+                        Click="RegisterButton_Click" 
+                        Style="{DynamicResource PrimaryButtonStyle}" />
+            </StackPanel>
+        </Border>
     </Grid>
 </Window>

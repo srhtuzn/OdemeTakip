@@ -1,4 +1,5 @@
-﻿using System;
+﻿// OdemeTakip.Desktop.Converters/OdemeDurumuToButtonTextConverter.cs
+using System;
 using System.Globalization;
 using System.Windows.Data;
 
@@ -8,11 +9,11 @@ namespace OdemeTakip.Desktop.Converters
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value is bool odenmeDurumu)
+            if (value is bool isPaid)
             {
-                return odenmeDurumu ? "Geri Al" : "Öde";
+                return isPaid ? "Geri Al" : "Öde";
             }
-            return "Öde";
+            return "İşlem";
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

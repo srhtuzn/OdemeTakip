@@ -179,6 +179,9 @@ namespace OdemeTakip.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("Aciklama")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Banka")
                         .HasColumnType("nvarchar(max)");
 
@@ -336,6 +339,9 @@ namespace OdemeTakip.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int?>("SablonId")
+                        .HasColumnType("int");
+
                     b.Property<decimal>("Tutar")
                         .HasColumnType("decimal(18,2)");
 
@@ -344,6 +350,8 @@ namespace OdemeTakip.Data.Migrations
                     b.HasIndex("CariFirmaId");
 
                     b.HasIndex("CompanyId");
+
+                    b.HasIndex("SablonId");
 
                     b.ToTable("DegiskenOdemeler");
                 });
@@ -465,6 +473,12 @@ namespace OdemeTakip.Data.Migrations
                     b.Property<DateTime>("BaslangicTarihi")
                         .HasColumnType("datetime2");
 
+                    b.Property<int?>("CariFirmaId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("CompanyId")
+                        .HasColumnType("int");
+
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
@@ -489,9 +503,6 @@ namespace OdemeTakip.Data.Migrations
                     b.Property<string>("ParaBirimi")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("SirketAdi")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<int>("TaksitSayisi")
                         .HasColumnType("int");
 
@@ -499,6 +510,10 @@ namespace OdemeTakip.Data.Migrations
                         .HasColumnType("decimal(18,2)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CariFirmaId");
+
+                    b.HasIndex("CompanyId");
 
                     b.ToTable("Krediler");
                 });
@@ -561,6 +576,9 @@ namespace OdemeTakip.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("HarcamaKodu")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime>("HarcamaTarihi")
                         .HasColumnType("datetime2");
 
@@ -569,6 +587,9 @@ namespace OdemeTakip.Data.Migrations
 
                     b.Property<int>("KrediKartiId")
                         .HasColumnType("int");
+
+                    b.Property<bool>("OdenmeDurumu")
+                        .HasColumnType("bit");
 
                     b.Property<string>("ParaBirimi")
                         .IsRequired()
@@ -700,8 +721,14 @@ namespace OdemeTakip.Data.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
+                    b.Property<string>("OdemeBankasi")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("OdemeKodu")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("OdemeTarihi")
+                        .HasColumnType("datetime2");
 
                     b.Property<bool>("OdendiMi")
                         .HasColumnType("bit");
@@ -810,9 +837,15 @@ namespace OdemeTakip.Data.Migrations
                         .WithMany()
                         .HasForeignKey("CompanyId");
 
+                    b.HasOne("OdemeTakip.Entities.DegiskenOdemeSablonu", "Sablon")
+                        .WithMany()
+                        .HasForeignKey("SablonId");
+
                     b.Navigation("CariFirma");
 
                     b.Navigation("Company");
+
+                    b.Navigation("Sablon");
                 });
 
             modelBuilder.Entity("OdemeTakip.Entities.DegiskenOdemeSablonu", b =>
@@ -831,6 +864,21 @@ namespace OdemeTakip.Data.Migrations
                 });
 
             modelBuilder.Entity("OdemeTakip.Entities.GenelOdeme", b =>
+                {
+                    b.HasOne("CariFirma", "CariFirma")
+                        .WithMany()
+                        .HasForeignKey("CariFirmaId");
+
+                    b.HasOne("OdemeTakip.Entities.Company", "Company")
+                        .WithMany()
+                        .HasForeignKey("CompanyId");
+
+                    b.Navigation("CariFirma");
+
+                    b.Navigation("Company");
+                });
+
+            modelBuilder.Entity("OdemeTakip.Entities.Kredi", b =>
                 {
                     b.HasOne("CariFirma", "CariFirma")
                         .WithMany()

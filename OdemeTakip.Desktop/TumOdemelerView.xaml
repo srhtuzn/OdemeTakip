@@ -1,108 +1,159 @@
 ﻿<UserControl x:Class="OdemeTakip.Desktop.TumOdemelerView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:converters="clr-namespace:OdemeTakip.Desktop.Converters"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:OdemeTakip.Desktop"
+             xmlns:viewmodels="clr-namespace:OdemeTakip.Desktop.ViewModels"
+             xmlns:converters="clr-namespace:OdemeTakip.Desktop.Converters"
+             mc:Ignorable="d"
+             d:DesignHeight="700" d:DesignWidth="1200"
              Loaded="UserControl_Loaded">
-    <UserControl.Resources>
-        <converters:OdemeDurumuToButtonTextConverter x:Key="OdemeDurumuToButtonTextConverter"/>
-        <!-- diğer kaynaklar -->
-    </UserControl.Resources>
 
     <Grid Margin="10">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
-            <!-- Arama Alanı -->
             <RowDefinition Height="*"/>
-            <!-- Ödemeler Listesi -->
             <RowDefinition Height="Auto"/>
-            <!-- Expander Alanı -->
         </Grid.RowDefinitions>
 
-        <StackPanel Orientation="Horizontal" Margin="0,0,0,10" Grid.Row="0">
-            <TextBox x:Name="TxtArama" Width="250" 
-                     TextChanged="TxtArama_TextChanged" Margin="0,0,10,0"
-                     ToolTip="🔍 Ara (Kod, Açıklama, Cari)"/>
-            <ComboBox x:Name="CmbOdemeDurumu" Width="200" SelectionChanged="CmbOdemeDurumu_SelectionChanged" Margin="0,0,10,0">
-                <ComboBoxItem Content="Ödenecekler"/>
-                <ComboBoxItem Content="Ödenmişler"/>
-                <ComboBoxItem Content="Tümü"/>
-            </ComboBox>
-            <Button x:Name="BtnFiltreleYenile" Content="🔄 Yenile / Filtrele" Click="BtnFiltreleYenile_Click" />
-        </StackPanel>
+        <Grid Grid.Row="0" Margin="0,0,0,15">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
 
-        <!-- Ana Ödemeler Tablosu -->
+            <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0,0,20,0">
+                <Button Content="◀️ Önceki Ay" Command="{Binding PreviousMonthCommand}" Style="{DynamicResource PrimaryButton}" MinWidth="100"/>
+                <TextBlock Text="{Binding CurrentAyYil}" FontWeight="Bold" FontSize="18" VerticalAlignment="Center" Margin="10,0" Foreground="{DynamicResource PrimaryTextColor}"/>
+                <Button Content="Sonraki Ay ▶️" Command="{Binding NextMonthCommand}" Style="{DynamicResource PrimaryButton}" MinWidth="100"/>
+            </StackPanel>
+
+            <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                <Button Content="Bugün" Command="{Binding FilterTodayCommand}" Style="{DynamicResource AccentButton}" MinWidth="80"/>
+                <Button Content="Bu Hafta" Command="{Binding FilterThisWeekCommand}" Style="{DynamicResource AccentButton}" MinWidth="80"/>
+                <Button Content="Bu Ay" Command="{Binding FilterThisMonthCommand}" Style="{DynamicResource AccentButton}" MinWidth="80"/>
+            </StackPanel>
+
+            <StackPanel Grid.Row="1" Grid.ColumnSpan="2" Orientation="Horizontal" HorizontalAlignment="Left" Margin="0,10,0,0" VerticalAlignment="Center">
+                <TextBlock Text="Arama:" VerticalAlignment="Center" Margin="0,0,5,0" Foreground="{DynamicResource PrimaryTextColor}"/>
+                <TextBox Width="200" Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" Style="{DynamicResource ModernTextBox}" Margin="0,0,15,0"/>
+
+                <TextBlock Text="Durum:" VerticalAlignment="Center" Margin="0,0,5,0" Foreground="{DynamicResource PrimaryTextColor}"/>
+                <ComboBox Width="150" ItemsSource="{Binding OdemeDurumuFiltreSecenekleri}"
+                          SelectedItem="{Binding SelectedOdemeDurumuFilter, Mode=TwoWay}"
+                          Style="{DynamicResource ModernComboBox}"
+                          Margin="0,0,15,0">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Converter={StaticResource EnumDescriptionConverter}}"/>
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
+
+                <Button Content="🔄 Yenile" Command="{Binding LoadPaymentsCommand}" Style="{DynamicResource DefaultButton}" MinWidth="80"/>
+            </StackPanel>
+
+            <StackPanel Grid.Row="1" Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,10,0,0">
+                <Button Content="📊 Excel Rapor" Command="{Binding ExportToExcelCommand}" Style="{DynamicResource SuccessButton}" MinWidth="120"/>
+                <Button Content="📄 PDF Rapor" Command="{Binding ExportToPdfCommand}" Style="{DynamicResource DefaultButton}" MinWidth="120"/>
+            </StackPanel>
+        </Grid>
+
         <DataGrid x:Name="DgOdemeler"
                   Grid.Row="1"
+                  ItemsSource="{Binding Odemeler}"
+                  SelectedItem="{Binding SelectedOdeme, Mode=TwoWay}"
                   AutoGenerateColumns="False"
-                  IsReadOnly="True"
                   CanUserAddRows="False"
-                  AlternatingRowBackground="#f9f9f9"
+                  IsReadOnly="True"
+                  Margin="0"
+                  GridLinesVisibility="Horizontal"
+                  HorizontalGridLinesBrush="#E0E0E0"
+                  RowHeaderWidth="0"
                   SelectionMode="Single"
-                  MouseDoubleClick="DgOdemeler_MouseDoubleClick">
+                  AlternatingRowBackground="#f2f2f2"
+                  MouseDoubleClick="DgOdemeler_MouseDoubleClick"
+                  Style="{DynamicResource DataGridStyle}">
+            <DataGrid.RowStyle>
+                <Style TargetType="DataGridRow" BasedOn="{StaticResource {x:Type DataGridRow}}">
+                    <Setter Property="Background" Value="{Binding OdenmeDurumu, Converter={StaticResource DurumRenkConverter}}"/>
+                    <Setter Property="Foreground" Value="Black"/>
+                    <Setter Property="Height" Value="Auto"/>
+                </Style>
+            </DataGrid.RowStyle>
+            <DataGrid.ColumnHeaderStyle>
+                <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource {x:Type DataGridColumnHeader}}">
+                    <Setter Property="Background" Value="{DynamicResource PrimaryBrush}"/>
+                    <Setter Property="Foreground" Value="White"/>
+                    <Setter Property="FontWeight" Value="Bold"/>
+                    <Setter Property="Padding" Value="5"/>
+                    <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                </Style>
+            </DataGrid.ColumnHeaderStyle>
             <DataGrid.Columns>
-                <DataGridTextColumn Header="Kod" Binding="{Binding Kod}" Width="100"/>
-                <DataGridTextColumn Header="Tip" Binding="{Binding KaynakModul}" Width="150"/>
-                <DataGridTextColumn Header="Açıklama" Binding="{Binding Aciklama}" Width="*"/>
-                <DataGridTextColumn Header="Şirket" Binding="{Binding SirketAdi}" Width="*" />
-                <DataGridTextColumn Header="Cari Firma" Binding="{Binding CariFirmaAdi}" Width="*" />
-                <DataGridTextColumn Header="Vade Tarihi" Binding="{Binding Tarih, StringFormat=dd.MM.yyyy}" Width="120"/>
-                <DataGridTextColumn Header="Tutar" Binding="{Binding Tutar, StringFormat=N2}" Width="100"/>
-                <DataGridTextColumn Header="P.B." Binding="{Binding ParaBirimi}" Width="70"/>
-                <DataGridTextColumn Header="Ö.Tarihi" Binding="{Binding OdemeTarihi, StringFormat=dd.MM.yyyy}" Width="100"/>
-                <DataGridTextColumn Header="Ö.Banka" Binding="{Binding OdemeBankasi}" Width="120"/>
-                <DataGridTextColumn Header="Ödeyen" Binding="{Binding OdeyenKullaniciAdi}" Width="120"/>
+                <DataGridTextColumn Header="Kod" Binding="{Binding Kod}" Width="Auto" MinWidth="80"/>
+                <DataGridTextColumn Header="Ödeme Tipi" Binding="{Binding ModulTipiAciklama}" Width="*" MinWidth="100"/>
 
-                <!-- İşlem Butonu -->
-                <DataGridTemplateColumn Header="İşlem" Width="100">
+                <DataGridTemplateColumn Header="Açıklama" Width="2*" MinWidth="200">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <Button Content="{Binding OdenmeDurumu, Converter={StaticResource OdemeDurumuToButtonTextConverter}}"
-                                    Click="BtnOdemeIslem_Click"
-                                    Tag="{Binding}" 
-                                    Padding="4,2" MinWidth="60" HorizontalAlignment="Center">
-                                <Button.Style>
-                                    <Style TargetType="Button">
-                                        <Setter Property="Visibility" Value="Collapsed"/>
-                                        <Style.Triggers>
-                                            <!-- Ödenmemiş ise Öde butonu görünür -->
-                                            <DataTrigger Binding="{Binding OdenmeDurumu}" Value="False">
-                                                <Setter Property="Visibility" Value="Visible"/>
-                                            </DataTrigger>
-                                            <!-- Ödenmiş ve kullanıcı admin ise Geri Al butonu görünür -->
-                                            <MultiDataTrigger>
-                                                <MultiDataTrigger.Conditions>
-                                                    <Condition Binding="{Binding OdenmeDurumu}" Value="True"/>
-                                                    <Condition Binding="{Binding RelativeSource={RelativeSource AncestorType=UserControl}, Path=DataContext.IsCurrentUserAdmin}" Value="True"/>
-                                                </MultiDataTrigger.Conditions>
-                                                <Setter Property="Visibility" Value="Visible"/>
-                                            </MultiDataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </Button.Style>
-                            </Button>
+                            <TextBlock Text="{Binding Aciklama}"
+                                       TextWrapping="Wrap"
+                                       VerticalAlignment="Center"
+                                       Margin="2"/>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
 
+                <DataGridTextColumn Header="Tarih" Binding="{Binding Tarih, StringFormat='dd.MM.yyyy'}" Width="Auto" MinWidth="90"/>
+                <DataGridTextColumn Header="Tutar" Width="Auto" MinWidth="120">
+                    <DataGridTextColumn.Binding>
+                        <MultiBinding StringFormat="{}{0:N2} {1}">
+                            <Binding Path="Tutar"/>
+                            <Binding Path="ParaBirimi"/>
+                        </MultiBinding>
+                    </DataGridTextColumn.Binding>
+                </DataGridTextColumn>
+                <DataGridTextColumn Header="Durum" Binding="{Binding OdenmeDurumu, Converter={StaticResource DurumYaziConverter}}" Width="Auto" MinWidth="80"/>
+                <DataGridTextColumn Header="Şirket" Binding="{Binding SirketAdi}" Width="*" MinWidth="120"/>
+                <DataGridTextColumn Header="Cari Firma" Binding="{Binding CariFirmaAdi}" Width="*" MinWidth="120"/>
+                <DataGridTextColumn Header="Ödenen Banka" Binding="{Binding OdemeBankasi}" Width="Auto" MinWidth="100"/>
+                <DataGridTextColumn Header="Ödeyen" Binding="{Binding OdeyenKullaniciAdi}" Width="Auto" MinWidth="100"/>
+                <DataGridTemplateColumn Header="İşlem" Width="Auto" MinWidth="90">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Button Content="{Binding OdenmeDurumu, Converter={StaticResource OdemeDurumuToButtonTextConverter}}"
+                                    Command="{Binding DataContext.ChangePaymentStatusCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                    CommandParameter="{Binding}"
+                                    Style="{DynamicResource ActionButton}" Margin="2" Padding="2"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
             </DataGrid.Columns>
         </DataGrid>
 
-        <!-- Sonraki Taksitler Expander (Butonsuz!) -->
-        <Expander x:Name="ExpanderSonrakiTaksitler" Header="📅 Sonraki Taksitler" Grid.Row="2" Visibility="Collapsed" IsExpanded="False" Margin="0,10,0,0">
-            <DataGrid x:Name="DgSonrakiTaksitler"
-                      AutoGenerateColumns="False"
-                      IsReadOnly="True"
-                      CanUserAddRows="False"
-                      AlternatingRowBackground="#f9f9f9"
-                      SelectionMode="Single">
-                <DataGrid.Columns>
-                    <DataGridTextColumn Header="Taksit No" Binding="{Binding TaksitNo}" Width="100"/>
-                    <DataGridTextColumn Header="Vade Tarihi" Binding="{Binding VadeTarihi, StringFormat=dd.MM.yyyy}" Width="150"/>
-                    <DataGridTextColumn Header="Tutar" Binding="{Binding Tutar, StringFormat=N2}" Width="150"/>
-                    <DataGridTextColumn Header="Durum" Binding="{Binding Durum}" Width="100"/>
-                    <!-- Burada buton yok! -->
-                </DataGrid.Columns>
-            </DataGrid>
-        </Expander>
+        <StackPanel Grid.Row="2" Orientation="Vertical" HorizontalAlignment="Right" Margin="0,15,0,0">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,0,0,5">
+                <TextBlock Text="Toplam Ödeme:" FontWeight="Bold" Margin="0,0,5,0" Foreground="{DynamicResource PrimaryTextColor}"/>
+                <TextBlock Text="{Binding ToplamOdeme, StringFormat='{}{0:N2} TL'}" Width="100" TextAlignment="Right" FontWeight="SemiBold" Foreground="{DynamicResource PrimaryTextColor}"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,0,0,5">
+                <TextBlock Text="Ödenmemiş Tutar:" FontWeight="Bold" Foreground="#F44336" Margin="0,0,5,0"/>
+                <TextBlock Text="{Binding OdenmemisTutar, StringFormat='{}{0:N2} TL'}" Width="100" TextAlignment="Right" FontWeight="SemiBold" Foreground="#F44336"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <TextBlock Text="Gecikmiş Tutar:" FontWeight="Bold" Foreground="#B71C1C" Margin="0,0,5,0"/>
+                <TextBlock Text="{Binding GecikmisTutar, StringFormat='{}{0:N2} TL'}" Width="100" TextAlignment="Right" FontWeight="SemiBold" Foreground="#B71C1C"/>
+            </StackPanel>
+        </StackPanel>
     </Grid>
+
+    <UserControl.Resources>
+    </UserControl.Resources>
 </UserControl>

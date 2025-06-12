@@ -19,6 +19,7 @@ namespace OdemeTakip.Desktop
             Loaded += Window_Loaded;
         }
 
+
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             {
@@ -106,14 +107,24 @@ namespace OdemeTakip.Desktop
         // (Bir önceki cevabımda bu metodu sağlamıştım)
         private void LogoutAndShowLogin()
         {
+            App.SetCurrentUser(null!); // Kullanıcıyı temizle
 
-            App.SetCurrentUser(null!); // Mevcut kullanıcı bilgisini temizle
+            // Login ekranını aç
+            LoginWindow loginWindow = new();
+            bool? result = loginWindow.ShowDialog(); // Show değil ShowDialog
 
-            LoginWindow loginWindow = new ();
-            loginWindow.Show(); // Yeni bir login penceresi aç
+            if (result == true && App.CurrentUser != null)
+            {
+                // Başarıyla yeni kullanıcı ile giriş yapıldıysa:
+                MainWindow newMainWindow = new();  // Yeni bir MainWindow oluştur
+                Application.Current.MainWindow = newMainWindow;
+                newMainWindow.Show();
+            }
 
-            this.Close(); // Mevcut MainWindow'u kapat
+            // Eski MainWindow'u kapat
+            this.Close();
         }
+
 
         private void UserManagementButton_Click(object sender, RoutedEventArgs e)
         {
@@ -141,31 +152,38 @@ namespace OdemeTakip.Desktop
         {
             if (e.Source is TabControl tabControl && tabControl.Name == "MainTabControl")
             {
+                // TumOdemelerView için
+                // Eğer tabTumOdemeler seçiliyse ve kontrol mevcutsa, ViewModel'indeki LoadPaymentsCommand'ı çağır.
+                // Bu, DataContext'in TumOdemelerListViewModel olduğundan emin olduğumuz için güvenlidir.
                 if (tabTumOdemeler.IsSelected && tumOdemelerViewControl != null)
-                    tumOdemelerViewControl.FiltreleVeYukle();
-
-                if (genelOdemeControl != null && genelOdemeControl.IsVisible)
-                    genelOdemeControl.YenidenYukle();
-
-                if (sabitGiderControl != null && sabitGiderControl.IsVisible)
-                    sabitGiderControl.YenidenYukle();
-
-                if (krediControl != null && krediControl.IsVisible)
-                    krediControl.YenidenYukle();
-
-                if (cekControl != null && cekControl.IsVisible)
-                    cekControl.YenidenYukle();
-
-                if (tabDashboard.IsSelected && dashboardControl != null)
                 {
-                    dashboardControl.YenidenYukle(); // Satır 102 (IDE0059 için kontrol edin)
+                    // tumOdemelerViewControl'un DataContext'i TumOdemelerListViewModel olmalı.
+                    if (tumOdemelerViewControl.DataContext is TumOdemelerListViewModel tumOdemelerViewModel)
+                    {
+                        tumOdemelerViewModel.LoadPaymentsCommand.Execute(null);
+                    }
                 }
+
+                // Diğer kontroller için de benzer şekilde ViewModel'deki YenidenYukle komutlarını çağırın.
+                // Eğer bu kontroller de MVVM'ye taşındıysa, kendi ViewModel'leri üzerinden komutları olmalıdır.
+                // Şimdilik sadece IsVisible kontrolünü kaldırıyorum, çünkü YenidenYukle() çağrısı genelde yeterlidir.
+                if (genelOdemeControl != null /* && genelOdemeControl.IsVisible */)
+                    genelOdemeControl.YenidenYukle(); // Bu metodun hala View'de olduğunu varsayarak
+
+                if (sabitGiderControl != null /* && sabitGiderControl.IsVisible */)
+                    sabitGiderControl.YenidenYukle(); // Bu metodun hala View'de olduğunu varsayarak
+
+                if (krediControl != null /* && krediControl.IsVisible */)
+                    krediControl.YenidenYukle(); // Bu metodun hala View'de olduğunu varsayarak
+
+                if (cekControl != null /* && cekControl.IsVisible */)
+                    cekControl.YenidenYukle(); // Bu metodun hala View'de olduğunu varsayarak
 
                 if (MainTabControl.SelectedItem is TabItem selectedTab && selectedTab.Name == "UserManagementTab")
                 {
                     if (selectedTab.Content is UserManagementPanelView umView)
                     {
-                         umView.YenidenYukle(); 
+                        umView.YenidenYukle();
                     }
                 }
             }

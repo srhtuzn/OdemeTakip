@@ -1,15 +1,12 @@
 ﻿<Window x:Class="OdemeTakip.Desktop.KrediKartiForm"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Kredi Kartı Formu" Height="600" Width="450"
+        Title="Kredi Kartı Formu" SizeToContent="Height"  Width="450"
         WindowStartupLocation="CenterScreen">
     <ScrollViewer>
         <StackPanel Margin="20">
             <TextBlock Text="Kart Adı:"/>
             <TextBox x:Name="txtCardName" Margin="0 0 0 10"/>
-
-            <TextBlock Text="Sahip Türü (Şirket / Şahıs):"/>
-            <TextBox x:Name="txtOwnerType" Margin="0 0 0 10"/>
 
             <TextBlock Text="Şirket Adı:"/>
             <!-- 🔥 Labelı değiştirdim -->

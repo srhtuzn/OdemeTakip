@@ -33,7 +33,10 @@ namespace OdemeTakip.Entities
         public Company? Company { get; set; }
         public string? OdeyenKullaniciAdi { get; set; }
         public int? CariFirmaId { get; set; }   // Yeni ekleyeceğimiz alan
-        public virtual CariFirma CariFirma { get; set; } // Navigation Property
+        public virtual CariFirma? CariFirma { get; set; } // Navigation Property
+        public int? SablonId { get; set; } // Hangi şablondan geldiğini belirtir
+        public virtual DegiskenOdemeSablonu? Sablon { get; set; } // Navigation Property
+
     }
 
 }

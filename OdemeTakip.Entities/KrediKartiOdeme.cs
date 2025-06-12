@@ -1,4 +1,5 @@
-﻿using System;
+﻿// OdemeTakip.Entities/KrediKartiOdeme.cs
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
@@ -21,7 +22,7 @@ namespace OdemeTakip.Entities
 
         [Column(TypeName = "decimal(18,2)")]
         public decimal Tutar { get; set; }
-        public DateTime? OdemeTarihi { get; set; }
+        public DateTime? OdemeTarihi { get; set; } // Nullable olduğu için DateTime?
 
         public string? Banka { get; set; }
         public bool OdenmeDurumu { get; set; } = false;
@@ -29,22 +30,15 @@ namespace OdemeTakip.Entities
         public bool IsActive { get; set; } = true;
         public string? OdeyenKullaniciAdi { get; set; }
 
-        // 🔥 Yeni Alanlar (Taksit İçin)
-        public int? TaksitNo { get; set; }
-        public int? ToplamTaksit { get; set; }
-        public DateTime? IlkOdemeTarihi { get; set; }
-        public int? KrediKartiId { get; set; }
+        // Yeni Alanlar (Taksit İçin)
+        public int? TaksitNo { get; set; } // Nullable olduğu için int?
+        public int? ToplamTaksit { get; set; } // Nullable olduğu için int?
+        public DateTime? IlkOdemeTarihi { get; set; } // Nullable olduğu için DateTime?
+        public int? KrediKartiId { get; set; } // Nullable olduğu için int?
 
-        [ForeignKey(nameof(KrediKartiId))]   // <-- EKLEMELİYİZ!
+        [ForeignKey(nameof(KrediKartiId))]
         public KrediKarti? KrediKarti { get; set; }
-        public int? KrediKartiHarcamaId { get; set; }  // 🔥 Bağlı Harcama
-        public KrediKartiHarcama? KrediKartiHarcama { get; set; }  // Navigation Property
-
-
-
-
+        public int? KrediKartiHarcamaId { get; set; } // Nullable olduğu için int?
+        public KrediKartiHarcama? KrediKartiHarcama { get; set; } // Navigation Property
     }
-
-
-
 }

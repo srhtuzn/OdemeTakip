@@ -9,7 +9,16 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="--TumOdemelerView.xaml.cs" />
+    <Compile Remove="ViewModels\-TumOdemelerListViewModel.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Remove="loginlogo.jpeg" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Remove="--TumOdemelerView.xaml" />
   </ItemGroup>
 
   <ItemGroup>
@@ -22,6 +31,7 @@
     <PackageReference Include="OpenTK" Version="4.9.4" />
     <PackageReference Include="OxyPlot.Wpf" Version="2.2.0" />
     <PackageReference Include="SkiaSharp.Views.WPF" Version="2.88.9" />
+    <PackageReference Include="Syncfusion.SfGrid.WPF" Version="29.2.9" />
   </ItemGroup>
 
   <ItemGroup>

@@ -1,0 +1,81 @@
+﻿<Window x:Class="OdemeTakip.Desktop.EksikFaturaForm"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Fatura Ekle / Düzenle"
+        Width="450" Height="Auto"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize">
+
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Başlık -->
+        <TextBlock Grid.Row="0" Text="Fatura Bilgileri" FontSize="18" FontWeight="Bold" Margin="0,0,0,20"/>
+
+        <!-- Form -->
+        <Grid Grid.Row="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <!-- 0 Kod -->
+                <RowDefinition Height="Auto"/>
+                <!-- 1 Gider Türü -->
+                <RowDefinition Height="Auto"/>
+                <!-- 2 Açıklama -->
+                <RowDefinition Height="Auto"/>
+                <!-- 3 Tarih -->
+                <RowDefinition Height="Auto"/>
+                <!-- 4 Tutar -->
+                <RowDefinition Height="Auto"/>
+                <!-- 5 Fatura No (Yeni) -->
+                <RowDefinition Height="Auto"/>
+                <!-- 6 Para Birimi -->
+                <RowDefinition Height="Auto"/>
+                <!-- 7 Şirket -->
+                <RowDefinition Height="Auto"/>
+                <!-- 8 Cari Firma -->
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="150"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <Label Grid.Row="0" Grid.Column="0" Content="Kod:" VerticalAlignment="Center"/>
+            <TextBox Grid.Row="0" Grid.Column="1" x:Name="txtKod" IsReadOnly="True" Background="#EEE"/>
+
+            <Label Grid.Row="1" Grid.Column="0" Content="Gider Türü:" VerticalAlignment="Center" Margin="0,10,0,0"/>
+            <ComboBox Grid.Row="1" Grid.Column="1" x:Name="cmbGiderTuru" Margin="0,10,0,0"/>
+
+            <Label Grid.Row="2" Grid.Column="0" Content="Açıklama:" VerticalAlignment="Center" Margin="0,10,0,0"/>
+            <TextBox Grid.Row="2" Grid.Column="1" x:Name="txtAciklama" Margin="0,10,0,0"/>
+
+            <Label Grid.Row="3" Grid.Column="0" Content="Tarih:" VerticalAlignment="Center" Margin="0,10,0,0"/>
+            <DatePicker Grid.Row="3" Grid.Column="1" x:Name="dpTarih" Margin="0,10,0,0"/>
+
+            <Label Grid.Row="4" Grid.Column="0" Content="Tutar:" VerticalAlignment="Center" Margin="0,10,0,0"/>
+            <TextBox Grid.Row="4" Grid.Column="1" x:Name="txtTutar" Margin="0,10,0,0"/>
+
+            <!-- 🚀 Yeni Eklendi -->
+            <Label Grid.Row="5" Grid.Column="0" Content="Fatura No:" VerticalAlignment="Center" Margin="0,10,0,0"/>
+            <TextBox Grid.Row="5" Grid.Column="1" x:Name="txtFaturaNo" Margin="0,10,0,0"/>
+
+            <Label Grid.Row="6" Grid.Column="0" Content="Para Birimi:" VerticalAlignment="Center" Margin="0,10,0,0"/>
+            <ComboBox Grid.Row="6" Grid.Column="1" x:Name="cmbParaBirimi" Margin="0,10,0,0"/>
+
+            <Label Grid.Row="7" Grid.Column="0" Content="Şirket:" VerticalAlignment="Center" Margin="0,10,0,0"/>
+            <ComboBox Grid.Row="7" Grid.Column="1" x:Name="cmbSirket" Margin="0,10,0,0"/>
+
+            <Label Grid.Row="8" Grid.Column="0" Content="Cari Firma:" VerticalAlignment="Center" Margin="0,10,0,0"/>
+            <ComboBox Grid.Row="8" Grid.Column="1" x:Name="cmbCariFirma" Margin="0,10,0,0"/>
+        </Grid>
+
+        <!-- Butonlar -->
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,20,0,0">
+            <Button Content="Kaydet" Width="100" Margin="5" Click="BtnKaydet_Click"/>
+            <Button Content="İptal" Width="100" Margin="5" Click="BtnIptal_Click"/>
+        </StackPanel>
+    </Grid>
+</Window>

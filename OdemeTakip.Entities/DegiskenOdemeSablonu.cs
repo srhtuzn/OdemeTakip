@@ -20,7 +20,7 @@ namespace OdemeTakip.Entities
         public bool IsActive { get; set; } = true;
         public string? OdeyenKullaniciAdi { get; set; }
         public int? CariFirmaId { get; set; } // 🔥 Burayı ekle!
-        public virtual CariFirma CariFirma { get; set; } // 🔥 Navigation Property
+        public virtual CariFirma? CariFirma { get; set; } // 🔥 Navigation Property
     }
 
 }

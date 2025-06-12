@@ -2,35 +2,13 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:OdemeTakip.Desktop"
-             xmlns:viewmodels="clr-namespace:OdemeTakip.Desktop.Converters" 
-             ShutdownMode="OnExplicitShutdown">
-    <!-- 
-    ShutdownMode="OnExplicitShutdown": Uygulama sadece Application.Current.Shutdown() metodu
-                                       açıkça çağrıldığında kapanır. Bu, login penceresi
-                                       kapatıldığında ana uygulama penceresi açılmadan
-                                       uygulamanın kapanmasını engeller.
-
-    StartupUri="LoginWindow.xaml" veya StartupUri="MainWindow.xaml" gibi bir satır OLMAMALIDIR
-    eğer başlangıç penceresini App.xaml.cs içindeki OnStartup metodunda yönetiyorsanız.
-    -->
+             xmlns:converters="clr-namespace:OdemeTakip.Desktop.Converters" ShutdownMode="OnExplicitShutdown">
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Resources/Theme.xaml"/>
             </ResourceDictionary.MergedDictionaries>
 
-            <viewmodels:DurumYaziConverter x:Key="DurumYaziConverter"/>
-            <viewmodels:DurumRenkConverter x:Key="DurumRenkConverter"/>
-            <viewmodels:StringNullOrEmptyToVisibilityConverter x:Key="StringNullOrEmptyToVisibilityConverter"/>
-            <viewmodels:BooleanToStatusStringConverter x:Key="BooleanToStatusStringConverter"/>
-
-            <!-- Örnek bir stil:
-            <Style TargetType="Button">
-                <Setter Property="MinWidth" Value="75"/>
-                <Setter Property="Padding" Value="8,5"/>
-                <Setter Property="Margin" Value="5"/>
-            </Style>
-            -->
         </ResourceDictionary>
     </Application.Resources>
-    
 </Application>

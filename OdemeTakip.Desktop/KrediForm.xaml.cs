@@ -1,126 +1,57 @@
-﻿using OdemeTakip.Data;
-using OdemeTakip.Entities;
+﻿// OdemeTakip.Desktop/KrediForm.xaml.cs
 using System;
+using System.ComponentModel; // INotifyPropertyChanged için
 using System.Windows;
-using System.Windows.Controls;
+using OdemeTakip.Data; // AppDbContext için
+using OdemeTakip.Entities; // Kredi entity için (sadece constructor'da tip olarak geçer)
+using OdemeTakip.Desktop.ViewModels; // KrediFormViewModel için
 
 namespace OdemeTakip.Desktop
 {
+    /// <summary>
+    /// KrediForm.xaml için code-behind sınıfı.
+    /// MVVM prensiplerine göre sadeleştirilmiştir. Tüm iş mantığı KrediFormViewModel'de bulunur.
+    /// </summary>
     public partial class KrediForm : Window
     {
-        private readonly AppDbContext _db;
-        private readonly Kredi _kredi;
-        private readonly bool _isEdit;
+        private KrediFormViewModel _viewModel;
 
+        /// <summary>
+        /// KrediForm'un yeni bir örneğini başlatır.
+        /// </summary>
+        /// <param name="db">Veritabanı bağlamı (AppDbContext).</param>
+        /// <param name="kredi">Düzenlenecek Kredi nesnesi (null ise yeni kayıt).</param>
         public KrediForm(AppDbContext db, Kredi? kredi = null)
         {
             InitializeComponent();
 
-            _db = db;
-            _kredi = kredi ?? new Kredi();
-            _isEdit = kredi != null;
-            BankalariYukle();
-            SirketleriYukle();
+            // ViewModel'i oluştur ve DataContext'e bağla.
+            _viewModel = new KrediFormViewModel(db, kredi);
+            this.DataContext = _viewModel;
 
-            if (_isEdit)
+            // ViewModel'in DialogResult property'sindeki değişiklikleri dinle.
+            _viewModel.PropertyChanged += ViewModel_PropertyChanged;
+        }
+
+        /// <summary>
+        /// ViewModel'deki property değişikliklerini dinler.
+        /// Özellikle DialogResult property'si değiştiğinde pencereyi kapatır.
+        /// </summary>
+        /// <param name="sender">Olayı tetikleyen nesne (ViewModel).</param>
+        /// <param name="e">Property değişimi olay argümanları.</param>
+        private void ViewModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(KrediFormViewModel.DialogResult) && _viewModel.DialogResult.HasValue)
             {
-                CmbSirketAdi.Text = _kredi.SirketAdi;
-                txtKonu.Text = _kredi.KrediKonusu;
-                txtToplamTutar.Text = _kredi.ToplamTutar.ToString();
-                txtTaksitSayisi.Text = _kredi.TaksitSayisi.ToString();
-                txtAylikTaksit.Text = _kredi.AylikTaksitTutari.ToString();
-                txtOdenen.Text = _kredi.OdenenTutar.ToString();
-                dpBaslangic.SelectedDate = _kredi.BaslangicTarihi;
-                txtNot.Text = _kredi.Notlar;
-                cmbBanka.Text = _kredi.Banka;
+                this.DialogResult = _viewModel.DialogResult;
+                this.Close();
             }
         }
 
-        private void SirketleriYukle()
-        {
-            CmbSirketAdi.ItemsSource = _db.Companies
-                .Where(c => c.IsActive)
-                .Select(c => c.Name)
-                .ToList();
-        }
-
-        private void BankalariYukle()
-        {
-            cmbBanka.ItemsSource = _db.Bankalar.Where(b => b.IsActive).Select(b => b.Adi).ToList();
-        }
-
-        private string KrediKoduUret()
-        {
-            int mevcutSayi = _db.Krediler.Count() + 1;
-            return $"K{mevcutSayi.ToString("D4")}"; // Örnek: K0001
-        }
-
-        private void BtnKaydet_Click(object sender, RoutedEventArgs e)
-        {
-            _kredi.SirketAdi = CmbSirketAdi.Text.Trim();
-            _kredi.KrediKonusu = txtKonu.Text.Trim();
-            _kredi.Notlar = txtNot.Text.Trim();
-            _kredi.Banka = cmbBanka.Text.Trim();
-            _kredi.IsActive = true;
-            if (dpBaslangic.SelectedDate == null)
-            {
-                MessageBox.Show("Lütfen başlangıç tarihi seçin.", "Uyarı", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return;
-            }
-
-            var selectedCurrency = (cmbParaBirimi.SelectedItem as ComboBoxItem)?.Content?.ToString();
-            if (string.IsNullOrWhiteSpace(selectedCurrency))
-            {
-                MessageBox.Show("Lütfen para birimi seçin.", "Uyarı", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return;
-            }
-            _kredi.ParaBirimi = selectedCurrency;
-
-            if (decimal.TryParse(txtToplamTutar.Text, out var toplam))
-                _kredi.ToplamTutar = toplam;
-
-            if (int.TryParse(txtTaksitSayisi.Text, out var taksit))
-                _kredi.TaksitSayisi = taksit;
-
-            if (decimal.TryParse(txtAylikTaksit.Text, out var aylik))
-                _kredi.AylikTaksitTutari = aylik;
-
-            if (decimal.TryParse(txtOdenen.Text, out var odenen))
-                _kredi.OdenenTutar = odenen;
-
-            if (dpBaslangic.SelectedDate != null)
-                _kredi.BaslangicTarihi = dpBaslangic.SelectedDate.Value;
-
-            _kredi.KalanTutar = _kredi.ToplamTutar - _kredi.OdenenTutar;
-
-            if (!_isEdit)
-            {
-                _kredi.KrediKodu = KrediKoduUret();
-                _db.Krediler.Add(_kredi);
-                _db.SaveChanges(); // ID alınmalı
-
-                // 🔄 Taksitleri otomatik oluştur (ilişki artık kuruluyor)
-                for (int i = 0; i < _kredi.TaksitSayisi; i++)
-                {
-                    var taksitKaydi = new KrediTaksit
-                    {
-                        KrediKodu = _kredi.KrediKodu,
-                        KrediId = _kredi.Id, // ✅ İLİŞKİ burada kuruluyor
-                        TaksitNo = i + 1,
-                        Tarih = _kredi.BaslangicTarihi.AddMonths(i),
-                        Tutar = _kredi.AylikTaksitTutari,
-                        OdenmeDurumu = false
-                    };
-
-                    _db.KrediTaksitler.Add(taksitKaydi);
-                }
-
-                _db.SaveChanges();
-            }
-
-            DialogResult = true;
-            Close();
-        }
-
+        // --- Kaldırılan Metotlar ve Alanlar ---
+        // _db, _kredi, _isEdit alanları ViewModel'e taşındı.
+        // BankalariYukle(), SirketleriYukle(), KrediKoduUret(), BtnKaydet_Click() gibi
+        // tüm metotlar da ViewModel'e taşındı.
+        // UI elementlerine doğrudan erişim (CmbSirketAdi.Text gibi) XAML Binding'leri ile sağlanacak.
     }
 }

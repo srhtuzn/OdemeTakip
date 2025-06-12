@@ -6,69 +6,115 @@
         Height="650" Width="1000"
         MinHeight="500" MinWidth="800"
         WindowStartupLocation="CenterScreen"
-        Icon="loginlogo.jpeg">
+        Icon="loginlogo.jpeg"
+        Background="{DynamicResource LightBrush}"
+        Loaded="Window_Loaded">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <!-- Üst Menü -->
-        <StackPanel Grid.Row="0" Orientation="Horizontal" Background="Gray" Margin="10">
-            <TextBlock Text="👤 Hoş Geldiniz," Foreground="White" FontWeight="Bold" Margin="0,0,10,0"/>
-            <TextBlock x:Name="LoggedInUserFullNameTextBlock" Foreground="White" Margin="0,0,5,0"/>
-            <TextBlock Text="(" Foreground="White"/>
-            <TextBlock x:Name="LoggedInUserRoleTextBlock" Foreground="White" FontStyle="Italic"/>
-            <TextBlock Text=")" Foreground="White" Margin="0,0,5,0"/>
+        <DockPanel Grid.Row="0" Background="{DynamicResource PrimaryBrush}" LastChildFill="False" Height="50" VerticalAlignment="Top">
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="10,0,0,0">
+                <TextBlock Text="👤 Hoş Geldiniz," Foreground="White" FontWeight="SemiBold" FontSize="14" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                <TextBlock x:Name="LoggedInUserFullNameTextBlock" Foreground="White" FontSize="14" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                <TextBlock Text="(" Foreground="White" FontSize="14" VerticalAlignment="Center"/>
+                <TextBlock x:Name="LoggedInUserRoleTextBlock" Foreground="White" FontStyle="Italic" FontSize="14" VerticalAlignment="Center"/>
+                <TextBlock Text=")" Foreground="White" FontSize="14" VerticalAlignment="Center"/>
+            </StackPanel>
 
-            <Button x:Name="LogoutButton" Content="🚪 Oturumu Kapat"
-                    HorizontalAlignment="Right" Margin="20,0,0,0" Width="150"
-                    Click="LogoutButton_Click"/>
-        </StackPanel>
+            <StackPanel Orientation="Horizontal" DockPanel.Dock="Right" VerticalAlignment="Center" Margin="0,0,10,0">
+                <Button x:Name="UserManagementButton" Content="👤 Kullanıcı Yönetimi"
+                        Visibility="Collapsed" Click="UserManagementButton_Click" Margin="0,0,10,0"/>
+                <Button x:Name="LogoutButton"
+                        Content="🚪 Oturumu Kapat"
+                        Width="150" Margin="5,0"
+                        Click="LogoutButton_Click" />
+            </StackPanel>
+        </DockPanel>
 
-        <!-- Ana TabControl -->
-        <TabControl x:Name="MainTabControl" Grid.Row="1" Margin="10">
-            <TabItem x:Name="tabTumOdemeler" Header="📋 Tüm Ödeme Kayıtları">
+        <TabControl x:Name="MainTabControl" Grid.Row="1" Margin="10" Background="White" SelectionChanged="TabControl_SelectionChanged">
+            <TabControl.ItemContainerStyle>
+                <Style TargetType="TabItem">
+                    <Setter Property="Width" Value="150"/>
+                    <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                    <Setter Property="VerticalContentAlignment" Value="Center"/>
+                    <Setter Property="FontWeight" Value="SemiBold"/>
+                    <Setter Property="FontSize" Value="14"/>
+                    <Setter Property="ToolTip" Value="{Binding Header, RelativeSource={RelativeSource Self}}"/>
+                </Style>
+            </TabControl.ItemContainerStyle>
+
+            <TabItem x:Name="tabTumOdemeler" Header="📋 Ödeme Takip">
                 <local:TumOdemelerView x:Name="tumOdemelerViewControl"/>
             </TabItem>
-            <TabItem x:Name="tabDashboard" Header="📊 Finansal Özet">
-                <local:DashboardControl x:Name="dashboardControl"/>
-            </TabItem>
+
             <TabItem Header="🏢 Şirket &amp; Cariler">
-                <ScrollViewer VerticalScrollBarVisibility="Auto">
-                    <StackPanel Margin="10">
-                        <local:SirketYonetimiControl />
-                        <Separator Margin="0,20,0,20"/>
-                        <local:CariYonetimiControl />
-                    </StackPanel>
-                </ScrollViewer>
+                <Grid Margin="10">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <local:SirketYonetimiControl Grid.Row="0"/>
+                    <Separator Grid.Row="1" Margin="0,20,0,20"/>
+                    <local:CariYonetimiControl Grid.Row="2"/>
+                </Grid>
             </TabItem>
+
             <TabItem Header="💰 Krediler &amp; Çekler">
-                <ScrollViewer VerticalScrollBarVisibility="Auto">
-                    <StackPanel Margin="10">
-                        <local:KrediControl x:Name="krediControl"/>
-                        <Separator Margin="0,20,0,20"/>
-                        <local:CekControl x:Name="cekControl"/>
-                    </StackPanel>
-                </ScrollViewer>
+                <Grid Margin="10">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <local:KrediControl x:Name="krediControl" Grid.Row="0"/>
+                    <Separator Grid.Row="1" Margin="0,20,0,20"/>
+                    <local:CekControl x:Name="cekControl" Grid.Row="2"/>
+                </Grid>
             </TabItem>
-            <TabItem Header="Sabit &amp; Değişken Ödemeler">
-                <ScrollViewer VerticalScrollBarVisibility="Auto">
-                    <StackPanel Margin="10">
-                        <local:SabitGiderControl x:Name="sabitGiderControl"/>
-                        <Separator Margin="0,20,0,20"/>
-                        <local:GenelOdemeControl x:Name="genelOdemeControl"/>
-                        <Separator Margin="0,20,0,20"/>
-                        <local:DegiskenOdemeSablonuControl />
-                    </StackPanel>
-                </ScrollViewer>
+
+            <TabItem Header="Sabit &amp; Değişken Ö.">
+                <Grid Margin="10">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <local:SabitGiderControl x:Name="sabitGiderControl" Grid.Row="0"/>
+                    <Separator Grid.Row="1" Margin="0,20,0,20"/>
+                    <local:GenelOdemeControl x:Name="genelOdemeControl" Grid.Row="2"/>
+                </Grid>
             </TabItem>
+
+            <TabItem Header="📑 Abonelik Ö.">
+                <Grid Margin="10">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Grid.Row="0" Text="📝 Şablonlar" FontWeight="Bold" FontSize="16" Margin="0,0,0,10"/>
+                    <local:SablonControl x:Name="sablonControl" Grid.Row="1"/>
+
+                    <Separator Grid.Row="2" Margin="0,20,0,20"/>
+
+                    <TextBlock Grid.Row="2" Text="📋 Eksik Fatura Girişleri" FontWeight="Bold" FontSize="16" Margin="0,30,0,10" VerticalAlignment="Bottom"/>
+                    <local:EksikFaturaControl x:Name="eksikFaturaControl" Grid.Row="3"/>
+                </Grid>
+            </TabItem>
+
             <TabItem Header="💳 Kredi Kartları">
-                <!-- KrediKartiAnaView UserControl'ü eklendi -->
                 <local:KrediKartiAnaView x:Name="krediKartiAnaViewControl"/>
             </TabItem>
-
-
         </TabControl>
+
+        <Grid Grid.Row="2" Margin="0,10,0,0">
+        </Grid>
     </Grid>
 </Window>

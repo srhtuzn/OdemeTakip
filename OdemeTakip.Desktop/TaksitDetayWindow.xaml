@@ -1,0 +1,50 @@
+﻿<Window x:Class="OdemeTakip.Desktop.TaksitDetayWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="📄 Taksit Detayları"
+        Height="500" Width="800"
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="CanResize"
+        Background="{DynamicResource LightBrush}">
+
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Başlık -->
+        <TextBlock x:Name="txtBaslik"
+                   FontSize="24"
+                   FontWeight="Bold"
+                   Foreground="{DynamicResource PrimaryBrush}"
+                   Margin="0,0,0,20"
+                   Text="Taksit Detayları" />
+
+        <!-- DataGrid -->
+        <DataGrid x:Name="dgTaksitler"
+                  Grid.Row="1"
+                  AutoGenerateColumns="False"
+                  IsReadOnly="True"
+                  AlternatingRowBackground="{DynamicResource LightBrush}"
+                  RowBackground="White"
+                  BorderBrush="{DynamicResource PrimaryBrush}"
+                  BorderThickness="1"
+                  HeadersVisibility="Column"
+                  CanUserAddRows="False">
+
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Açıklama" Binding="{Binding Aciklama}" Width="*" />
+                <DataGridTextColumn Header="Taksit No" Binding="{Binding TaksitNo}" Width="100" />
+                <DataGridTextColumn Header="Tutar (₺)" Binding="{Binding Tutar, StringFormat=N2}" Width="120" />
+                <DataGridTextColumn Header="Vade Tarihi" Binding="{Binding VadeTarihi, StringFormat=dd.MM.yyyy}" Width="120" />
+                <DataGridTextColumn Header="Durum" Width="120">
+                    <DataGridTextColumn.Binding>
+                        <Binding Path="OdenmeDurumu" Converter="{StaticResource BooleanToStatusStringConverter}" />
+                    </DataGridTextColumn.Binding>
+                </DataGridTextColumn>
+            </DataGrid.Columns>
+
+        </DataGrid>
+    </Grid>
+</Window>

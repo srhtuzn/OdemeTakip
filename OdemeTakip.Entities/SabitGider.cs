@@ -1,4 +1,5 @@
-﻿using System;
+﻿// OdemeTakip.Entities/SabitGider.cs
+using System;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace OdemeTakip.Entities
@@ -21,11 +22,14 @@ namespace OdemeTakip.Entities
         public Company? Company { get; set; }
 
         public bool OtomatikMi { get; set; }
-        public bool OdendiMi { get; set; } = false;
+        public bool OdendiMi { get; set; } = false; // Ödendi/Ödenmedi durumu
         public bool IsActive { get; set; } = true;
         public string? OdeyenKullaniciAdi { get; set; }
-        public string? FaturaNo { get; set; } // Opsiyonel fatura no (fatura aramalarına uygun)
-        public int? CariFirmaId { get; set; }   // Yeni ekleyeceğimiz alan
-        public virtual CariFirma CariFirma { get; set; } // Navigation Property
+        public string? FaturaNo { get; set; }
+        public int? CariFirmaId { get; set; }
+        public virtual CariFirma? CariFirma { get; set; }
+
+        public DateTime? OdemeTarihi { get; set; } // Sabit giderin fiilen ödendiği tarih
+        public string? OdemeBankasi { get; set; } // Sabit giderin ödendiği banka hesabı bilgisi
     }
 }

@@ -35,5 +35,6 @@ namespace OdemeTakip.Data
 
             return new AppDbContext(optionsBuilder.Options);
         }
+
     }
 }

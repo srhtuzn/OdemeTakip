@@ -1,4 +1,5 @@
-﻿using System;
+﻿// OdemeTakip.Desktop.Converters/BooleanToStatusStringConverter.cs
+using System;
 using System.Globalization;
 using System.Windows.Data;
 
@@ -9,7 +10,9 @@ namespace OdemeTakip.Desktop.Converters
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             if (value is bool b)
-                return b ? "Ödendi" : "Ödenmedi";
+            {
+                return b ? "Aktif" : "Pasif";
+            }
             return "Bilinmiyor";
         }
 
